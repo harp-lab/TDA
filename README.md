@@ -92,6 +92,12 @@ Our generator provides 0-dimensional barcodes similar to Ripser generator. The f
 ## Reports
 Details report of the project can be found in the [reports directory](reports/).
 
+## Changelog
+Changelog of the project is listed in [Changelog.md](Changelog.md) file. The following commmand will generate new changelog based on commit messages:
+```commandline
+git log --pretty="- %s" > Changelog.md
+```
+
 ### References
 
 - [Ripser online tool](https://live.ripser.org/)
