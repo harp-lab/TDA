@@ -1,12 +1,15 @@
 # TDA
+
 TDA and Persistent homology
 
 ## Barcode generator
+
 ![0-dimensional barcodes](screenshots/matrix_4_4.png)
 
 ## Features
 
-- Currently, the generator is able to generate 0-dimensional barcodes chart for a given adjacency matrix of a point cloud.
+- Currently, the generator is able to generate 0-dimensional barcodes chart for a given adjacency matrix of a point
+  cloud.
 - Generates and stores `n * n` adjacency matrix in a CSV file.
 - Load adjacency matrix from CSV file to generate barcodes. Several dummy datasets are included in the repository.
 
@@ -66,21 +69,62 @@ Windows:
 .\venv\Scripts\activate.ps1
 ```
 
-- To run the project run the [main.py](./main.py):
-
-```commandline
-python3 main.py
-```
-
-or
+- The project allows command line arguments to generate 0-dimensional barcodes.
+- Check the options:
 
 ```commandline
 python main.py
 ```
 
+It will list the available options to this project:
+
+```commandline
+usage: main.py [-h] [--list] [--all] [--data DATA] [--matrix]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --list, -l            List available tests
+  --all, -a             Produce all demo
+  --data DATA, -d DATA  Input a specific dataset (case sensitive, must ends with .csv)
+  --matrix, -m          Attach adjacency matrix with barcodes
+```
+
+- To run all demo:
+
+```commandline
+python main.py --all
+```
+
+- To generate barcode for a specific dataset:
+
+```commandline
+python main.py --data {DATASET_NAME}.csv
+```
+
+Example:
+
+```commandline
+python main.py --data time_varying_4_4.csv
+```
+
+- To generate barcode including adjacency matrix for a specific dataset:
+
+```commandline
+python main.py --data {DATASET_NAME}.csv --matrix
+```
+
+Example:
+
+```commandline
+python main.py --data time_varying_4_4.csv --matrix
+```
+
+![alt time_varying_4_4 output](screenshots/time_varying_4_4.png)
+
 ### Compare with Ripser generator
 
-Our generator provides 0-dimensional barcodes similar to Ripser generator. The following table shows the isomorphic barcodes for identical datasets.
+Our generator provides 0-dimensional barcodes similar to Ripser generator. The following table shows the isomorphic
+barcodes for identical datasets.
 
 | Matrix size | Barcode generator | Ripser generator|
 | --- | --- | --- |
@@ -90,10 +134,14 @@ Our generator provides 0-dimensional barcodes similar to Ripser generator. The f
 | 100x100 | ![100x100](screenshots/matrix_100_100.png) | ![100x100](screenshots/matrix_100_100_ripser.png) |
 
 ## Reports
+
 Details report of the project can be found in the [reports directory](reports/).
 
 ## Changelog
-Changelog of the project is listed in [Changelog.md](Changelog.md) file. The following commmand will generate new changelog based on commit messages:
+
+Changelog of the project is listed in [Changelog.md](Changelog.md) file. The following commmand will generate new
+changelog based on commit messages:
+
 ```commandline
 git log --pretty="- %s" > Changelog.md
 ```
