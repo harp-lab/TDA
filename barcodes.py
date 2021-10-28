@@ -23,7 +23,7 @@ def get_number_of_components(matrix, min_distance):
     return group
 
 
-def get_barcodes(matrix, max_val=1.0):
+def get_barcodes(matrix, max_val=None):
     unique_distances = get_unique_distances(matrix)
     barcodes = list()
     number_of_components = None
@@ -40,6 +40,8 @@ def get_barcodes(matrix, max_val=1.0):
                 barcodes.append([0, distance])
             number_of_components = components
     remaining_bars = len(matrix[0]) - len(barcodes)
+    if max_val is None:
+        max_val = barcodes[-1][1]
     for i in range(remaining_bars):
         barcodes.append([0, max_val])
     barcodes = sorted(barcodes, key=lambda x: x[1], reverse=True)
