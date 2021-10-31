@@ -1,17 +1,20 @@
-from utils import get_dataset, draw_barcode_and_matrix, draw_barcode_only
-from barcodes import get_barcodes
-import os, argparse
+from utils import get_dataset, draw_barcode_and_matrix, draw_barcode_only, \
+    get_adjacency_for_triangle
+from barcodes import get_n_dim_barcodes
+from barcodes_manual import get_0_dim_barcodes
+import os
+import argparse
 
 
 # Driver code
 
 def demo():
     adjacency_matrix = get_dataset(filename="dataset_100_100.csv")
-    barcodes = get_barcodes(adjacency_matrix)
+    barcodes = get_n_dim_barcodes(adjacency_matrix, 0)
     draw_barcode_only(barcodes, adjacency_matrix)
 
     adjacency_matrix = get_dataset()
-    barcodes = get_barcodes(adjacency_matrix)
+    barcodes = get_n_dim_barcodes(adjacency_matrix, 0)
     draw_barcode_and_matrix(barcodes, adjacency_matrix)
 
 
@@ -21,24 +24,52 @@ def get_all_datasets():
     return datasets
 
 
-def barcode_only(dataset):
-    adjacency_matrix = get_dataset(filename=dataset)
-    barcodes = get_barcodes(adjacency_matrix)
-    draw_barcode_only(barcodes, adjacency_matrix)
+def plot_barcode(dataset, show_matrix=False,
+                 lower_matrix=False, upper_matrix=False):
+    if lower_matrix is True:
+        adjacency_matrix = get_adjacency_for_triangle(dataset)
+    elif upper_matrix is True:
+        adjacency_matrix = get_adjacency_for_triangle(dataset, lower=False)
+    else:
+        adjacency_matrix = get_dataset(filename=dataset)
 
+    barcodes = get_0_dim_barcodes(adjacency_matrix)
+    # print(barcodes)
+    # print(len(barcodes))
+    #
+    # barcodes = get_n_dim_barcodes(adjacency_matrix, 0)
+    # print(barcodes)
+    # print(len(barcodes))
+    #
+    # barcodes = get_n_dim_barcodes(adjacency_matrix, 1)
+    # print(barcodes)
+    # print(len(barcodes))
 
-def barcode_and_matrix(dataset):
-    adjacency_matrix = get_dataset(filename=dataset)
-    barcodes = get_barcodes(adjacency_matrix)
-    draw_barcode_and_matrix(barcodes, adjacency_matrix)
+    if show_matrix:
+        draw_barcode_and_matrix(barcodes, adjacency_matrix)
+    else:
+        draw_barcode_only(barcodes, adjacency_matrix)
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--list', '-l', help='List available tests', action='store_true')
-    parser.add_argument("--all", '-a', help='Produce all demo', action='store_true')
-    parser.add_argument('--data', '-d', help='Input a specific dataset (case sensitive, must ends with .csv)')
-    parser.add_argument('--matrix', '-m', help='Attach adjacency matrix with barcodes', action='store_true')
+    parser.add_argument('--list', '-l', help='List available tests',
+                        action='store_true')
+    parser.add_argument("--all", '-a', help='Produce all demo',
+                        action='store_true')
+    parser.add_argument('--data', '-d',
+                        help='Input a specific dataset ' \
+                             '(case sensitive, must ends with .csv)')
+    parser.add_argument('--lower', '-lo',
+                        help='CSV contains lower triangular distance matrix',
+                        action='store_true')
+    parser.add_argument('--upper', '-up',
+                        help='CSV contains upper triangular distance matrix ' \
+                             ' (MATLAB output from the function pdist)',
+                        action='store_true')
+    parser.add_argument('--matrix', '-m',
+                        help='Attach adjacency matrix with barcodes',
+                        action='store_true')
     args = parser.parse_args()
 
     if args.all:
@@ -50,9 +81,11 @@ def main():
             print(f'Dataset "{args.data}" not found')
         else:
             if args.matrix:
-                barcode_and_matrix(args.data)
+                plot_barcode(args.data, show_matrix=True,
+                             lower_matrix=args.lower, upper_matrix=args.upper)
             else:
-                barcode_only(args.data)
+                plot_barcode(args.data, show_matrix=False,
+                             lower_matrix=args.lower, upper_matrix=args.upper)
         return
 
     if args.list:

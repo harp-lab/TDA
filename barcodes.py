@@ -1,48 +1,26 @@
-def get_unique_distances(matrix):
-    return list(sorted(set([j for row in matrix for j in row])))
+import math
+import dionysus as d
+from utils import get_simplices
 
 
-def get_number_of_components(matrix, min_distance):
-    v = len(matrix[0])
-    group = 0
-    seen = set()
-    for i in range(v):
-        if i not in seen:
-            visited = [False for _ in range(v)]
-            start_node = i
-            q = [start_node]
-            visited[start_node] = True
-            while len(q) != 0:
-                current = q.pop(0)
-                seen.add(current)
-                for node in range(v):
-                    if visited[node] is False and matrix[current][node] <= min_distance:
-                        q.append(node)
-                        visited[node] = True
-            group += 1
-    return group
-
-
-def get_barcodes(matrix, max_val=None):
-    unique_distances = get_unique_distances(matrix)
-    barcodes = list()
-    number_of_components = None
-    for distance in unique_distances:
-        components = get_number_of_components(matrix, distance)
-        if components == 1:
-            barcodes.append([0, distance])
-            break
-        if number_of_components is None:
-            number_of_components = components
-            continue
-        if components < number_of_components:
-            for i in range(number_of_components - components):
-                barcodes.append([0, distance])
-            number_of_components = components
-    remaining_bars = len(matrix[0]) - len(barcodes)
-    if max_val is None:
-        max_val = barcodes[-1][1]
-    for i in range(remaining_bars):
-        barcodes.append([0, max_val])
-    barcodes = sorted(barcodes, key=lambda x: x[1], reverse=True)
+def get_n_dim_barcodes(matrix, n):
+    barcodes = []
+    simplices = get_simplices(matrix)
+    ph_filter = d.Filtration()
+    for vertices, distance in simplices:
+        ph_filter.append(d.Simplex(vertices, distance))
+    ph_filter.sort()
+    boundary_matrix = d.homology_persistence(ph_filter)
+    diagrams = d.init_diagrams(boundary_matrix, ph_filter)
+    # d.plot.plot_bars(diagrams[n], show=True)
+    if len(diagrams) > n:
+        pd = sorted(diagrams[n], key=lambda x: x.death)
+        prev_value = 0
+        for bar in pd:
+            if bar.death == math.inf:
+                barcodes.append([bar.birth, prev_value])
+            else:
+                value = round(bar.death, 2)
+                barcodes.append([bar.birth, value])
+                prev_value = value
     return barcodes

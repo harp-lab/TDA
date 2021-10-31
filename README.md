@@ -8,16 +8,20 @@ TDA and Persistent homology
 
 ## Features
 
-- Currently, the generator is able to generate 0-dimensional barcodes chart for a given adjacency matrix of a point
-  cloud.
+- Currently, the generator is able to generate 0-dimensional barcodes chart for
+  a given adjacency matrix of a point cloud.
 - Generates and stores `n * n` adjacency matrix in a CSV file.
-- Load adjacency matrix from CSV file to generate barcodes. Several dummy datasets are included in the repository.
+- Load adjacency matrix from CSV file to generate barcodes. Several dummy
+  datasets are included in the repository.
 
 ## Local Setup
 
 ### Requirements
 
 - Python 3
+- GCC
+- [Boost](https://www.boost.org/doc/libs/1_77_0/more/getting_started/unix-variants.html)
+  for `dionysus` package.
 
 ### Install dependencies
 
@@ -38,7 +42,8 @@ Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 .\venv\Scripts\Activate.ps1
 ```
 
-After activated `venv`, the terminal / powershell will have `(venv)` added to the prompt.
+After activated `venv`, the terminal / powershell will have `(venv)` added to
+the prompt.
 
 - Check `pip` version:
 
@@ -121,10 +126,16 @@ python main.py --data time_varying_4_4.csv --matrix
 
 ![alt time_varying_4_4 output](screenshots/time_varying_4_4.png)
 
+- To generate barcode from lower distance matrix add `--lower` to the end.
+Example:
+```commandline
+python main.py --data random16.lower_distance_matrix.csv --lower
+```
+
 ### Compare with Ripser generator
 
-Our generator provides 0-dimensional barcodes similar to Ripser generator. The following table shows the isomorphic
-barcodes for identical datasets.
+Our generator provides 0-dimensional barcodes similar to Ripser generator. The
+following table shows the isomorphic barcodes for identical datasets.
 
 | Matrix size | Barcode generator | Ripser generator|
 | --- | --- | --- |
@@ -135,12 +146,13 @@ barcodes for identical datasets.
 
 ## Reports
 
-Details report of the project can be found in the [reports directory](reports/).
+Details report of the project can be found in the [reports directory](reports/)
+.
 
 ## Changelog
 
-Changelog of the project is listed in [Changelog.md](Changelog.md) file. The following commmand will generate new
-changelog based on commit messages:
+Changelog of the project is listed in [Changelog.md](Changelog.md) file. The
+following commmand will generate new changelog based on commit messages:
 
 ```commandline
 git log --pretty="- %s" > Changelog.md
@@ -150,3 +162,6 @@ git log --pretty="- %s" > Changelog.md
 
 - [Ripser online tool](https://live.ripser.org/)
 - [Ripser Github repository](https://github.com/Ripser/ripser)
+- [Dionysus 2 Github repository](https://github.com/mrzv/dionysus)
+- [Dionysus slides](https://www.mrzv.org/software/dionysus/_downloads/dionysus-slides.pdf)
+- [Dionysus 2 documentation](https://mrzv.org/software/dionysus2/tutorial/basics.html)
