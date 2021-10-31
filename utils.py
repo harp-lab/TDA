@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import random
 import csv
+import numpy as np
 
 
 def get_adjacency_for_triangle(triangular_matrix, lower=True):
@@ -93,7 +94,7 @@ def draw_barcode_and_matrix(data, matrix):
     plt.show()
 
 
-def draw_barcode_only(data, matrix):
+def draw_barcode_only(data, matrix, show_value=False):
     plt.rcdefaults()
     fig, ax = plt.subplots()
     max_x_axis = sorted([i[1] for i in data], reverse=True)[0]
@@ -105,6 +106,24 @@ def draw_barcode_only(data, matrix):
     ax.set_title('0 dimensional barcodes: {} vertices, {} bars'.format(
         len(matrix[0]), len(data)
     ))
+    if show_value:
+        ax.bar_label(ax.containers[0])
     ax.set_xlim([0, max_x_axis])
     plt.tight_layout()
+    plt.show()
+
+
+def draw_bars(barcodes, matrix, show_value=False):
+    bar_counts = len(barcodes)
+    barcodes = np.array(barcodes)
+    barcodes.sort(axis=1)
+    means = np.mean(barcodes, axis=1)
+    half_range = barcodes[:, 1] - means
+    _, caps, _ = plt.errorbar(means, np.arange(bar_counts) + 1,
+                              xerr=half_range,
+                              ls='',
+                              elinewidth=3)  # capsize=2 for boundary on bar
+    for cap in caps:
+        cap.set_markeredgewidth(3)
+    plt.ylim(0, bar_counts + 1)
     plt.show()

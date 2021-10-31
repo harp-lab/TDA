@@ -112,20 +112,6 @@ Example:
 python main.py --data time_varying_4_4.csv
 ```
 
-- To generate barcode including adjacency matrix for a specific dataset:
-
-```commandline
-python main.py --data {DATASET_NAME}.csv --matrix
-```
-
-Example:
-
-```commandline
-python main.py --data time_varying_4_4.csv --matrix
-```
-
-![alt time_varying_4_4 output](screenshots/time_varying_4_4.png)
-
 - To generate barcode from lower distance matrix add `--lower` to the end.
 Example:
 ```commandline
@@ -165,3 +151,5 @@ git log --pretty="- %s" > Changelog.md
 - [Dionysus 2 Github repository](https://github.com/mrzv/dionysus)
 - [Dionysus slides](https://www.mrzv.org/software/dionysus/_downloads/dionysus-slides.pdf)
 - [Dionysus 2 documentation](https://mrzv.org/software/dionysus2/tutorial/basics.html)
+- [Ripser python package](https://pypi.org/project/ripser/)
+- [Ripser python package api reference](https://ripser.scikit-tda.org/en/latest/reference/stubs/ripser.ripser.html#ripser.ripser)
