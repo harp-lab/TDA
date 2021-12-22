@@ -1,7 +1,7 @@
 import os
 import argparse
-from utils import get_dataset, draw_barcode_and_matrix, draw_barcode_only, \
-    get_adjacency_for_triangle, draw_bars
+from utils import get_dataset, get_adjacency_for_triangle, draw_bars
+from barcodes_manual import get_0_dim_barcodes
 from barcodes_ripser import get_n_dim_barcodes
 
 
@@ -9,7 +9,11 @@ from barcodes_ripser import get_n_dim_barcodes
 
 def demo():
     adjacency_matrix = get_dataset(filename="dataset_20_20.csv")
-    barcodes = get_n_dim_barcodes(adjacency_matrix, 0)
+    barcodes = get_0_dim_barcodes(adjacency_matrix)
+    barcodes = barcodes[::-1]
+    print(len(barcodes))
+    for i, pair in enumerate(barcodes):
+        print(i, pair)
     draw_bars(barcodes, adjacency_matrix)
 
 
@@ -27,8 +31,17 @@ def plot_barcode(dataset, dimension=0,
         adjacency_matrix = get_adjacency_for_triangle(dataset, lower=False)
     else:
         adjacency_matrix = get_dataset(filename=dataset)
-
-    barcodes = get_n_dim_barcodes(matrix=adjacency_matrix, n=dimension)
+    if dimension == 0:
+        barcodes = get_0_dim_barcodes(adjacency_matrix)
+        barcodes = barcodes[::-1]
+        print(
+            "Barcodes generated using Graph algorithm (connected components)")
+    else:
+        barcodes = get_n_dim_barcodes(matrix=adjacency_matrix, n=dimension)
+        print("Barcodes generated using Ripser library")
+    print(len(barcodes))
+    for i, pair in enumerate(barcodes):
+        print(i, pair)
     draw_bars(barcodes, adjacency_matrix)
 
 
@@ -39,16 +52,16 @@ def main():
     parser.add_argument("--all", '-a', help='Produce all demo',
                         action='store_true')
     parser.add_argument('--data', '-d',
-                        help='Input a specific dataset ' \
+                        help='Input a specific dataset '
                              '(case sensitive, must ends with .csv)')
     parser.add_argument('--dim', '-di',
-                        help='Input a dimension ' \
+                        help='Input a dimension '
                              '(0-n)')
     parser.add_argument('--lower', '-lo',
                         help='CSV contains lower triangular distance matrix',
                         action='store_true')
     parser.add_argument('--upper', '-up',
-                        help='CSV contains upper triangular distance matrix ' \
+                        help='CSV contains upper triangular distance matrix '
                              ' (MATLAB output from the function pdist)',
                         action='store_true')
     args = parser.parse_args()

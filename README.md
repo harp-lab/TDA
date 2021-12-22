@@ -130,6 +130,12 @@ following table shows the isomorphic barcodes for identical datasets.
 | 20x20 | ![20x20](screenshots/matrix_20_20.png) | ![20x20](screenshots/matrix_20_20_ripser.png) |
 | 100x100 | ![100x100](screenshots/matrix_100_100.png) | ![100x100](screenshots/matrix_100_100_ripser.png) |
 
+### Time varying paper
+- Create barcodes for given graphs:
+```commandline
+python main.py --data g0.csv --lower
+```
+
 ## Reports
 
 Details report of the project can be found in the [reports directory](reports/)
