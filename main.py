@@ -3,18 +3,37 @@ import argparse
 from utils import get_dataset, get_adjacency_for_triangle, draw_bars
 from barcodes_manual import get_0_dim_barcodes
 from barcodes_ripser import get_n_dim_barcodes
+from distance_calculation import get_wasserstein_distance, get_1_wasserstein_distance
 
 
 # Driver code
 
 def demo():
-    adjacency_matrix = get_dataset(filename="dataset_20_20.csv")
-    barcodes = get_0_dim_barcodes(adjacency_matrix)
-    barcodes = barcodes[::-1]
-    print(len(barcodes))
-    for i, pair in enumerate(barcodes):
-        print(i, pair)
-    draw_bars(barcodes, adjacency_matrix)
+    adjacency_matrix_0 = get_adjacency_for_triangle("g0.csv")
+    barcodes_0 = get_0_dim_barcodes(adjacency_matrix_0)
+    barcodes_0 = barcodes_0[::-1]
+
+    adjacency_matrix_1 = get_adjacency_for_triangle("g1.csv")
+    barcodes_1 = get_0_dim_barcodes(adjacency_matrix_1)
+    barcodes_1 = barcodes_1[::-1]
+
+    adjacency_matrix_2 = get_adjacency_for_triangle("g2.csv")
+    barcodes_2 = get_0_dim_barcodes(adjacency_matrix_2)
+    barcodes_2 = barcodes_2[::-1]
+
+    print(barcodes_0)
+    print(barcodes_2)
+
+    # was_dis_0_1 = get_1_wasserstein_distance(barcodes_0, barcodes_1)
+    was_dis_0_2 = get_1_wasserstein_distance(barcodes_0, barcodes_2)
+    # was_dis_1_2 = get_1_wasserstein_distance(barcodes_1, barcodes_2)
+    # #
+    # print(was_dis_0_1, was_dis_0_2, was_dis_1_2)
+    print(was_dis_0_2)
+    # print(len(barcodes))
+    # for i, pair in enumerate(barcodes):
+    #     print(i, pair)
+    # draw_bars(barcodes, adjacency_matrix)
 
 
 def get_all_datasets():
