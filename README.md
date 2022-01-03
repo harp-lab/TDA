@@ -150,6 +150,27 @@ following commmand will generate new changelog based on commit messages:
 git log --pretty="- %s" > Changelog.md
 ```
 
+## External library
+- RDDR:
+```commandline
+library(TDA)
+
+A = matrix(c(0, 0, 0.5, 0, 0, 1.2, 0, 0, 1.2, 0, 0, 2.5, 0, 0, 3.3, 0, 0, 3.3), nrow=6, ncol=3, byrow = TRUE)
+B = matrix(c(0, 0, 0.5, 0, 0, 1.2, 0, 0, 2.0, 0, 0, 2.5, 0, 0, 5.0, 0, 0, 5.0), nrow=6, ncol=3, byrow = TRUE)
+wassersteinDist <- wasserstein(A, B, p = 1, dimension = 0)
+print(wassersteinDist)
+# 4.2
+
+library(TDA)
+
+A = matrix(c(0, 0, 0.5, 0, 0, 1.2, 0, 0, 1.2, 0, 0, 2.5, 0, 0, 3.3, 0, 0, Inf), nrow=6, ncol=3, byrow = TRUE)
+B = matrix(c(0, 0, 0.5, 0, 0, 1.2, 0, 0, 2.0, 0, 0, 2.5, 0, 0, 5.0, 0, 0, Inf), nrow=6, ncol=3, byrow = TRUE)
+wassersteinDist <- wasserstein(A, B, p = 1, dimension = 0)
+print(wassersteinDist)
+# 2.5
+
+```
+
 ### References
 
 - [Ripser online tool](https://live.ripser.org/)
@@ -159,3 +180,4 @@ git log --pretty="- %s" > Changelog.md
 - [Dionysus 2 documentation](https://mrzv.org/software/dionysus2/tutorial/basics.html)
 - [Ripser python package](https://pypi.org/project/ripser/)
 - [Ripser python package api reference](https://ripser.scikit-tda.org/en/latest/reference/stubs/ripser.ripser.html#ripser.ripser)
+- [Gudhi Wasserstein Distance](https://gudhi.inria.fr/python/latest/wasserstein_distance_user.html)
