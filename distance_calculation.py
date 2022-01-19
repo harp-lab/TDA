@@ -22,6 +22,8 @@ def get_1_wasserstein_distance_gudhi():
         dgm1, dgm2, order=1., internal_p=2.)
     print(message)
     # 2.5
+
+
 def get_1_wasserstein_distance(pd_1, pd_2):
     return wasserstein_distance([ar[1] for ar in pd_1],
                                 [ar[1] for ar in pd_2])

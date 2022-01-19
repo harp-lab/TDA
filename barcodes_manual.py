@@ -45,5 +45,6 @@ def get_0_dim_barcodes(matrix, max_val=None):
         max_val = barcodes[-1][1]
     for i in range(remaining_bars):
         barcodes.append([0, max_val])
-    barcodes = sorted(barcodes, key=lambda x: x[1], reverse=True)
+    barcodes = [[round(birth, 2), round(death, 2)] for birth, death in barcodes]
+    barcodes = sorted(barcodes, key=lambda x: x[1], reverse=False)
     return barcodes

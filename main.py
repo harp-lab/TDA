@@ -2,38 +2,59 @@ import os
 import argparse
 from utils import get_dataset, get_adjacency_for_triangle, draw_bars
 from barcodes_manual import get_0_dim_barcodes
-from barcodes_ripser import get_n_dim_barcodes
-from distance_calculation import get_wasserstein_distance, get_1_wasserstein_distance
+import barcodes_ripser
+import barcodes_dionysus
+# from distance_calculation import get_wasserstein_distance, \
+#     get_1_wasserstein_distance
 
 
 # Driver code
 
 def demo():
-    adjacency_matrix_0 = get_adjacency_for_triangle("g0.csv")
-    barcodes_0 = get_0_dim_barcodes(adjacency_matrix_0)
-    barcodes_0 = barcodes_0[::-1]
+    filepath = 'fmri_data/normalize_dfc_2500_subject_1_time_1.txt'
+    adjacency_matrix = get_dataset(filename=filepath, fmri=True)
 
-    adjacency_matrix_1 = get_adjacency_for_triangle("g1.csv")
-    barcodes_1 = get_0_dim_barcodes(adjacency_matrix_1)
-    barcodes_1 = barcodes_1[::-1]
+    print("Dionysus barcodes: ")
+    dionysus_barcodes = barcodes_dionysus.get_n_dim_barcodes(adjacency_matrix,
+                                                             0)
+    # print(dionysus_barcodes)
+    print("=" * 24)
 
-    adjacency_matrix_2 = get_adjacency_for_triangle("g2.csv")
-    barcodes_2 = get_0_dim_barcodes(adjacency_matrix_2)
-    barcodes_2 = barcodes_2[::-1]
+    print("Ripser barcodes: ")
+    ripser_barcodes = barcodes_ripser.get_n_dim_barcodes(adjacency_matrix, 0)
+    print(ripser_barcodes == dionysus_barcodes)
+    print("=" * 24)
 
-    print(barcodes_0)
-    print(barcodes_2)
+    print("Manual barcodes: ")
+    manual_barcodes = get_0_dim_barcodes(adjacency_matrix)
+    print(manual_barcodes == ripser_barcodes)
+    print("=" * 24)
 
-    # was_dis_0_1 = get_1_wasserstein_distance(barcodes_0, barcodes_1)
-    was_dis_0_2 = get_1_wasserstein_distance(barcodes_0, barcodes_2)
-    # was_dis_1_2 = get_1_wasserstein_distance(barcodes_1, barcodes_2)
-    # #
-    # print(was_dis_0_1, was_dis_0_2, was_dis_1_2)
-    print(was_dis_0_2)
-    # print(len(barcodes))
-    # for i, pair in enumerate(barcodes):
-    #     print(i, pair)
-    # draw_bars(barcodes, adjacency_matrix)
+    # adjacency_matrix_0 = get_adjacency_for_triangle("g0.csv")
+    # barcodes_0 = get_0_dim_barcodes(adjacency_matrix_0)
+    # barcodes_0 = barcodes_0[::-1]
+    #
+    # adjacency_matrix_1 = get_adjacency_for_triangle("g1.csv")
+    # barcodes_1 = get_0_dim_barcodes(adjacency_matrix_1)
+    # barcodes_1 = barcodes_1[::-1]
+    #
+    # adjacency_matrix_2 = get_adjacency_for_triangle("g2.csv")
+    # barcodes_2 = get_0_dim_barcodes(adjacency_matrix_2)
+    # barcodes_2 = barcodes_2[::-1]
+    #
+    # print(barcodes_0)
+    # print(barcodes_2)
+    #
+    # # was_dis_0_1 = get_1_wasserstein_distance(barcodes_0, barcodes_1)
+    # was_dis_0_2 = get_1_wasserstein_distance(barcodes_0, barcodes_2)
+    # # was_dis_1_2 = get_1_wasserstein_distance(barcodes_1, barcodes_2)
+    # # #
+    # # print(was_dis_0_1, was_dis_0_2, was_dis_1_2)
+    # print(was_dis_0_2)
+    # # print(len(barcodes))
+    # # for i, pair in enumerate(barcodes):
+    # #     print(i, pair)
+    # # draw_bars(barcodes, adjacency_matrix)
 
 
 def get_all_datasets():
@@ -56,7 +77,8 @@ def plot_barcode(dataset, dimension=0,
         print(
             "Barcodes generated using Graph algorithm (connected components)")
     else:
-        barcodes = get_n_dim_barcodes(matrix=adjacency_matrix, n=dimension)
+        barcodes = barcodes_ripser.get_n_dim_barcodes(matrix=adjacency_matrix,
+                                                      n=dimension)
         print("Barcodes generated using Ripser library")
     print(len(barcodes))
     for i, pair in enumerate(barcodes):

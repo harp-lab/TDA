@@ -40,10 +40,17 @@ def get_simplices(matrix):
     return simplices
 
 
-def get_dataset(filename='dataset_4_4.csv', v=100, generate=False):
+def get_dataset(filename='dataset_4_4.csv', v=100, generate=False, fmri=False):
     if generate:
         return generate_large_dataset(v=v, filename=filename)
     data = []
+    if fmri:
+        with open(filename) as fmri_file:
+            fmri_reader = csv.reader(fmri_file, delimiter='\t')
+            for line in fmri_reader:
+                values = [float(c.strip()) for c in line if c.strip() != ""]
+                data.append(values)
+        return data
     with open(filename) as csv_file:
         csv_reader = csv.reader(csv_file, delimiter=',')
         for line in csv_reader:
