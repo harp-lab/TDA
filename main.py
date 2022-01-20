@@ -1,9 +1,13 @@
 import os
 import argparse
+
+import numpy as np
+
 from utils import get_dataset, get_adjacency_for_triangle, draw_bars
-from barcodes_manual import get_0_dim_barcodes
 import barcodes_ripser
-import barcodes_dionysus
+from distance_calculation import get_wasserstein_distance_gudhi
+
+
 # from distance_calculation import get_wasserstein_distance, \
 #     get_1_wasserstein_distance
 
@@ -11,24 +15,31 @@ import barcodes_dionysus
 # Driver code
 
 def demo():
-    filepath = 'fmri_data/normalize_dfc_2500_subject_1_time_1.txt'
-    adjacency_matrix = get_dataset(filename=filepath, fmri=True)
+    for i in range(1, 7):
+        for j in range(i + 1, 7):
+            filepath_1 = f'fmri_data/normalize_dfc_2500_subject_1_time_{i}.txt'
+            adjacency_matrix_1 = get_dataset(filename=filepath_1, fmri=True)
 
-    print("Dionysus barcodes: ")
-    dionysus_barcodes = barcodes_dionysus.get_n_dim_barcodes(adjacency_matrix,
-                                                             0)
-    # print(dionysus_barcodes)
-    print("=" * 24)
+            ripser_barcodes_1 = barcodes_ripser.get_0_dim_barcodes(
+                adjacency_matrix_1,
+                max_value=1.0)
 
-    print("Ripser barcodes: ")
-    ripser_barcodes = barcodes_ripser.get_n_dim_barcodes(adjacency_matrix, 0)
-    print(ripser_barcodes == dionysus_barcodes)
-    print("=" * 24)
+            filepath_2 = f'fmri_data/normalize_dfc_2500_subject_1_time_{j}.txt'
+            adjacency_matrix_2 = get_dataset(filename=filepath_2, fmri=True)
 
-    print("Manual barcodes: ")
-    manual_barcodes = get_0_dim_barcodes(adjacency_matrix)
-    print(manual_barcodes == ripser_barcodes)
-    print("=" * 24)
+            ripser_barcodes_2 = barcodes_ripser.get_0_dim_barcodes(
+                adjacency_matrix_2,
+                max_value=1.0)
+            distance = get_wasserstein_distance_gudhi(ripser_barcodes_1,
+                                                      ripser_barcodes_2)
+            distance = round(distance, 3)
+            print(i, j, ": ", end="")
+            print(distance)
+
+    # print("Manual barcodes: ")
+    # manual_barcodes = get_0_dim_barcodes(adjacency_matrix)
+    # print(manual_barcodes == ripser_barcodes)
+    # print("=" * 24)
 
     # adjacency_matrix_0 = get_adjacency_for_triangle("g0.csv")
     # barcodes_0 = get_0_dim_barcodes(adjacency_matrix_0)

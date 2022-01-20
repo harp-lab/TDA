@@ -6,6 +6,13 @@ import gudhi.wasserstein
 import numpy as np
 
 
+def get_wasserstein_distance_gudhi(dgm_1, dgm_2):
+    dgm_1 = np.array(dgm_1)
+    dgm_2 = np.array(dgm_2)
+    return gudhi.wasserstein.wasserstein_distance(dgm_1, dgm_2,
+                                                  order=1., internal_p=2.)
+
+
 def get_1_wasserstein_distance_gudhi():
     dgm1 = np.array([[2.7, 3.7], [9.6, 14.], [34.2, 34.974]])
     dgm2 = np.array([[2.8, 4.45], [9.5, 14.1]])
