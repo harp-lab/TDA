@@ -1,23 +1,21 @@
 import os
 import argparse
-
+import json
 import numpy as np
 
 from utils import get_dataset, get_adjacency_for_triangle, draw_bars
+from mds_calculator import get_mds
 import barcodes_ripser
 from distance_calculation import get_wasserstein_distance_gudhi
 
 
-# from distance_calculation import get_wasserstein_distance, \
-#     get_1_wasserstein_distance
-
-
 # Driver code
 
-def demo():
-    for i in range(1, 7):
-        for j in range(i + 1, 7):
-            filepath_1 = f'fmri_data/normalize_dfc_2500_subject_1_time_{i}.txt'
+def get_dissimalirity_matrix(subject_number):
+    dissimarity_matrix = [[0 for j in range(86)] for i in range(86)]
+    for i in range(1, 87):
+        for j in range(1, i):
+            filepath_1 = f'fmri_data/normalize_dfc_2500_subject_{subject_number}_time_{i}.txt'
             adjacency_matrix_1 = get_dataset(filename=filepath_1, fmri=True)
 
             ripser_barcodes_1 = barcodes_ripser.get_0_dim_barcodes(
@@ -33,8 +31,23 @@ def demo():
             distance = get_wasserstein_distance_gudhi(ripser_barcodes_1,
                                                       ripser_barcodes_2)
             distance = round(distance, 3)
-            print(i, j, ": ", end="")
-            print(distance)
+            dissimarity_matrix[i - 1][j - 1] = distance
+            dissimarity_matrix[j - 1][i - 1] = distance
+
+            # print(f"({i}, {j}) = ", end="")
+            # print(distance, end="\t")
+    return dissimarity_matrix
+
+
+def demo():
+    subject_number = 1
+    data_path = f'fmri_data/subject_{subject_number}.json'
+
+    dissimilarity_matrix = np.array(json.loads(open(data_path, "r").read()))
+    mds = get_mds(dissimilarity_matrix)
+    print(mds)
+
+    # dissimarity_matrix = np.array(di)
 
     # print("Manual barcodes: ")
     # manual_barcodes = get_0_dim_barcodes(adjacency_matrix)
@@ -83,7 +96,7 @@ def plot_barcode(dataset, dimension=0,
     else:
         adjacency_matrix = get_dataset(filename=dataset)
     if dimension == 0:
-        barcodes = get_0_dim_barcodes(adjacency_matrix)
+        barcodes = barcodes_ripser.get_0_dim_barcodes(adjacency_matrix)
         barcodes = barcodes[::-1]
         print(
             "Barcodes generated using Graph algorithm (connected components)")
@@ -140,6 +153,8 @@ def main():
         return
 
     parser.print_help()
+    demo()
+    return
 
 
 if __name__ == "__main__":
