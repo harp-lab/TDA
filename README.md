@@ -2,6 +2,10 @@
 
 TDA and Persistent homology
 
+## MDS
+![subject 1 MDS](screenshots/subject_1_mds.png)
+
+
 ## Barcode generator
 
 ![0-dimensional barcodes](screenshots/matrix_4_4.png)

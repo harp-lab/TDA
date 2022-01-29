@@ -4,7 +4,7 @@ import json
 import numpy as np
 
 from utils import get_dataset, get_adjacency_for_triangle, draw_bars
-from mds_calculator import get_mds
+from mds_calculator import get_mds, plot_mds
 import barcodes_ripser
 from distance_calculation import get_wasserstein_distance_gudhi
 
@@ -45,7 +45,7 @@ def demo():
 
     dissimilarity_matrix = np.array(json.loads(open(data_path, "r").read()))
     mds = get_mds(dissimilarity_matrix)
-    print(mds)
+    plot_mds(mds, subject_number)
 
     # dissimarity_matrix = np.array(di)
 
