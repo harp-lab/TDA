@@ -6,19 +6,17 @@ import numpy as np
 from utils import get_dataset, get_adjacency_for_triangle, draw_bars
 from mds_calculator import get_mds, plot_mds
 import barcodes_ripser
-from distance_matrix import generate_distance_matrix
 
 # Driver code
 
 
 def demo():
-    generate_distance_matrix("", "", "")
-    # subject_number = 1
-    # data_path = f'fmri_data/subject_{subject_number}.json'
-    #
-    # dissimilarity_matrix = np.array(json.loads(open(data_path, "r").read()))
-    # mds = get_mds(dissimilarity_matrix)
-    # plot_mds(mds, subject_number)
+    subject_number = 1
+    data_path = f'subjects_distance_matrix/subject_{subject_number}.json'
+
+    dissimilarity_matrix = np.array(json.loads(open(data_path, "r").read()))
+    mds = get_mds(dissimilarity_matrix)
+    plot_mds(mds, subject_number)
 
     # dissimarity_matrix = np.array(di)
 
