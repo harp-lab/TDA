@@ -3,6 +3,14 @@ import numpy as np
 from utils import get_dataset
 import barcodes_ripser
 from distance_calculation import get_wasserstein_distance_gudhi
+from mds_calculator import get_mds
+
+
+def get_mds_matrix(subject_id):
+    data_path = f'subjects_distance_matrix/subject_{subject_id}.json'
+    dissimilarity_matrix = np.array(json.loads(open(data_path, "r").read()))
+    mds_matrix = get_mds(dissimilarity_matrix)
+    return json.dumps(mds_matrix.tolist())
 
 
 def get_dissimilarity_matrix(data_dir, subject_number):
@@ -29,16 +37,31 @@ def get_dissimilarity_matrix(data_dir, subject_number):
             dissimilarity_matrix[j - 1][i - 1] = distance
     return dissimilarity_matrix
 
+
 def generate_distance_matrix(data_dir, generated_json_directory):
     for subject_number in range(1, 317):
         generated_json = f'{generated_json_directory}/subject_{subject_number}.json'
-        dissimilarity_matrix = get_dissimilarity_matrix(data_dir, subject_number)
+        dissimilarity_matrix = get_dissimilarity_matrix(data_dir,
+                                                        subject_number)
         with open(generated_json, "w") as f:
             json.dump(dissimilarity_matrix, f)
             print(f"JSON created for Subject {subject_number}")
     print("Done generating the JSON files")
 
+
+def generate_mds(mds_directory, json_directory):
+    for subject_number in range(1, 317):
+        generated_mds = f'{mds_directory}/subject_{subject_number}.json'
+        mds_matrix = get_mds_matrix(subject_number)
+        with open(generated_mds, "w") as f:
+            json.dump(mds_matrix, f)
+            print(f"JSON created for Subject {subject_number}")
+    print("Done generating the JSON files")
+
+
 if __name__ == "__main__":
     data_directory = "full_data/dfc_2500_normal"
     json_directory = "subjects_distance_matrix"
-    generate_distance_matrix(data_directory, json_directory)
+    mds_directory = "subjects_mds"
+    # generate_distance_matrix(data_directory, json_directory)
+    generate_mds(mds_directory, json_directory)
