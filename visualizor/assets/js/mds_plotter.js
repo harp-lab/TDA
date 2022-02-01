@@ -8,6 +8,7 @@ const CHART_COLORS = {
     grey: 'rgb(201, 203, 207)'
 };
 $(document).ready(function () {
+    Chart.register(ChartDataLabels);
 
     function set_subject_options() {
         var subjects = "";
@@ -35,7 +36,7 @@ $(document).ready(function () {
     }
 
 
-    function show_graph(rows, chart_title) {
+    function show_graph(rows, rows_2, chart_title) {
         const canvas_background_plugin = {
             id: 'custom_canvas_background_color',
             beforeDraw: (chart) => {
@@ -52,44 +53,58 @@ $(document).ready(function () {
         for (var i = 0; i < rows.length; i++) {
             chart_data.push({
                 x: parseFloat(rows[i][0]),
-                y: parseFloat(rows[i][1])
+                y: parseFloat(rows[i][1]),
+                label: i + 1
             });
         }
+
+        var chart_data_2 = [];
+        for (var i = 0; i < rows_2.length; i++) {
+            chart_data_2.push({
+                x: parseFloat(rows_2[i][0]),
+                y: parseFloat(rows_2[i][1]),
+                label: i + 1
+            });
+        }
+
         const config = {
-            type: 'scatter',
+            type: 'bubble',
             data: {
                 datasets: [
                     {
-                        label: 'Timeslots',
+                        label: 'Timeframe 1',
                         data: chart_data,
                         borderColor: CHART_COLORS.green,
                         backgroundColor: CHART_COLORS.green,
                         pointStyle: 'circle',
-                        pointRadius: 4,
-                        hoverRadius: 4
-
-                    }],
+                        pointRadius: 8,
+                        hoverRadius: 8
+                    },
+                    {
+                        label: 'Timeframe 2',
+                        data: chart_data_2,
+                        borderColor: CHART_COLORS.red,
+                        backgroundColor: CHART_COLORS.red,
+                        pointStyle: 'circle',
+                        pointRadius: 8,
+                        hoverRadius: 8
+                    }
+                ],
             },
             options: {
                 animation: false,
                 responsive: true,
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            align: 'center',
-                            text: 'MDS 1'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            align: 'center',
-                            text: 'MDS 2'
-                        }
-                    }
-                },
                 plugins: {
+                    datalabels: {
+                        font: {
+                            size: 9,
+                        },
+                        formatter: function (value) {
+                            return Math.round(value.label);
+                        },
+                        offset: 2,
+                        padding: 0
+                    },
                     legend: {
                         position: 'top',
                     },
@@ -108,7 +123,7 @@ $(document).ready(function () {
                     tooltip: {
                         callbacks: {
                             label: function (context) {
-                                let label = "Timeslot " + context.dataIndex;
+                                let label = "Timeframe " + context.raw.label;
                                 return label;
                             }
                         }
@@ -164,8 +179,11 @@ $(document).ready(function () {
         var subject_id = $('#subject_id')[0].value;
         var data_path = 'subjects_mds/subject_' + subject_id + '.json';
         var data = get_json_data(data_path);
+        var subject_id_2 = parseInt($('#subject_id')[0].value) + 1;
+        var data_path_2 = 'subjects_mds/subject_' + subject_id_2 + '.json';
+        var data_2 = get_json_data(data_path_2);
         $("#graph").hide();
-        show_graph(data, "MDS for Subject " + subject_id);
+        show_graph(data, data_2, "MDS for Subject " + subject_id + ", " + subject_id_2);
         $("#graph").show("slow");
     });
 
