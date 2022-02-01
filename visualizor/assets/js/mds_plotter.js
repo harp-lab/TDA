@@ -1,3 +1,12 @@
+const CHART_COLORS = {
+    red: 'rgb(255, 99, 132)',
+    orange: 'rgb(255, 159, 64)',
+    yellow: 'rgb(255, 205, 86)',
+    green: 'rgb(75, 192, 192)',
+    blue: 'rgb(54, 162, 235)',
+    purple: 'rgb(153, 102, 255)',
+    grey: 'rgb(201, 203, 207)'
+};
 $(document).ready(function () {
 
     function set_subject_options() {
@@ -25,6 +34,7 @@ $(document).ready(function () {
         return $.parseJSON(rows);
     }
 
+
     function show_graph(rows, chart_title) {
         const canvas_background_plugin = {
             id: 'custom_canvas_background_color',
@@ -45,83 +55,67 @@ $(document).ready(function () {
                 y: parseFloat(rows[i][1])
             });
         }
-        console.log(chart_data);
         const config = {
             type: 'scatter',
-            data: chart_data,
+            data: {
+                datasets: [
+                    {
+                        label: 'Timeslots',
+                        data: chart_data,
+                        borderColor: CHART_COLORS.green,
+                        backgroundColor: CHART_COLORS.green,
+                        pointStyle: 'circle',
+                        pointRadius: 4,
+                        hoverRadius: 4
+
+                    }],
+            },
             options: {
+                animation: false,
                 responsive: true,
+                scales: {
+                    x: {
+                        title: {
+                            display: true,
+                            align: 'center',
+                            text: 'MDS 1'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            align: 'center',
+                            text: 'MDS 2'
+                        }
+                    }
+                },
                 plugins: {
                     legend: {
                         position: 'top',
                     },
                     title: {
                         display: true,
-                        text: 'Chart.js Scatter Chart'
+                        text: chart_title,
+                        padding: {
+                            top: 10,
+                            bottom: 10
+                        },
+                        font: {
+                            size: 18
+                        }
+                    },
+                    canvas_background_plugin,
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                let label = "Timeslot " + context.dataIndex;
+                                return label;
+                            }
+                        }
                     }
                 }
             },
         };
-        // const config = {
-        //     type: 'scatter',
-        //     data: chart_data,
-        //     options: {
-        //         responsive: true,
-        //         plugins: {
-        //             legend: {
-        //                 position: 'top',
-        //             },
-        //             title: {
-        //                 display: true,
-        //                 text: 'Chart.js Scatter Chart'
-        //             }
-        //         }
-        //     },
-        //     // type: 'scatter',
-        //     // data: {datasets: chart_data},
-        //     // options: {
-        //     //     plugins: {
-        //     //         legend: {
-        //     //             display: true,
-        //     //             position: 'bottom',
-        //     //             labels: {
-        //     //                 boxWidth: 15,
-        //     //                 padding: 15
-        //     //             }
-        //     //         },
-        //     //         title: {
-        //     //             display: true,
-        //     //             text: chart_title,
-        //     //             padding: {
-        //     //                 top: 10,
-        //     //                 bottom: 10
-        //     //             },
-        //     //             font: {
-        //     //                 size: 18
-        //     //             }
-        //     //         }
-        //     //     },
-        //     //     animation: false,
-        //     //     responsive: true,
-        //     //     scales: {
-        //     //         x: {
-        //     //             title: {
-        //     //                 display: true,
-        //     //                 align: 'center',
-        //     //                 text: 'MDS 1'
-        //     //             }
-        //     //         },
-        //     //         y: {
-        //     //             title: {
-        //     //                 display: true,
-        //     //                 align: 'center',
-        //     //                 text: 'MDS 2'
-        //     //             }
-        //     //         }
-        //     //     },
-        //     // },
-        //     plugins: [canvas_background_plugin],
-        // };
         Chart.defaults.color = '#000';
         const ctx = document.getElementById('visualization_div').getContext('2d');
 
@@ -171,7 +165,7 @@ $(document).ready(function () {
         var data_path = 'subjects_mds/subject_' + subject_id + '.json';
         var data = get_json_data(data_path);
         $("#graph").hide();
-        show_graph(data, "some title");
+        show_graph(data, "MDS for Subject " + subject_id);
         $("#graph").show("slow");
     });
 
