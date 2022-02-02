@@ -76,14 +76,15 @@
             </div>
         </div>
         <div class="card">
-            <div class="card-header">Select one subject to see the time slots
+            <div class="card-header">
+                Select one or multiple subjects
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2 d-md-block text-start">
                     <div class="mb-3">
-                        <label for="subject_id" class="form-label">Select
-                            subject</label>
-                        <select name="subject_id" id="subject_id"
+                        <label for="subject_id" class="form-label">
+                            Select subject(s)</label>
+                        <select multiple name="subject_id" id="subject_id"
                                 class="form-select mb-3">
                         </select>
                     </div>
@@ -96,15 +97,14 @@
             </div>
 
         </div>
-        <div class="row mb-3" id="graph">
+        <div class="row my-3" id="graph">
             <h1 class="h3 mb-3"><strong>FCNVis</strong> Exposure</h1>
             <div class="col-12">
                 <div class="card mb-2">
                     <div class="card-header">
                         <span id="dataset_label"></span>
                         <div class="small text-muted fw-lighter">
-                            (Hover over the chart to show the
-                            relevant value)
+                            Click on the legends to toggle visibility of the subject
                         </div>
                     </div>
                     <div class="card-body">

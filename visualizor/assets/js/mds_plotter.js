@@ -1,17 +1,8 @@
-const CHART_COLORS = {
-    red: 'rgb(255, 99, 132)',
-    orange: 'rgb(255, 159, 64)',
-    yellow: 'rgb(255, 205, 86)',
-    green: 'rgb(75, 192, 192)',
-    blue: 'rgb(54, 162, 235)',
-    purple: 'rgb(153, 102, 255)',
-    grey: 'rgb(201, 203, 207)'
-};
 $(document).ready(function () {
     Chart.register(ChartDataLabels);
 
     function set_subject_options() {
-        var subjects = "";
+        let subjects = '';
         for (var i = 1; i <= 316; i++) {
             subjects += "<option value='" + i + "'>Subject " + i + "</option>";
         }
@@ -35,8 +26,49 @@ $(document).ready(function () {
         return $.parseJSON(rows);
     }
 
+    function get_datasets(subjects) {
 
-    function show_graph(rows, rows_2, chart_title) {
+        let default_colors = [CHART_COLORS.green, CHART_COLORS.red,
+            CHART_COLORS.purple, CHART_COLORS.blue,
+            CHART_COLORS.yellow, CHART_COLORS.orange];
+        var datasets = [];
+        for (let i = 0; i < subjects.length; i++) {
+            let current_chart_color;
+            if (subjects.length < 6) {
+                current_chart_color = default_colors[i];
+            } else {
+                current_chart_color = getRandomColors();
+            }
+
+            let subject_id = subjects[i];
+            var chart_data = [];
+            var data_path = 'subjects_mds/subject_' + subject_id + '.json';
+            var rows = get_json_data(data_path);
+            for (var j = 0; j < rows.length; j++) {
+                chart_data.push({
+                    x: parseFloat(rows[j][0]),
+                    y: parseFloat(rows[j][1]),
+                    label: j + 1
+                });
+            }
+            let subject_data = {
+                label: 'Subject ' + subject_id.toString(),
+                data: chart_data,
+                borderColor: current_chart_color,
+                backgroundColor: current_chart_color,
+                pointStyle: 'circle',
+                borderWidth: 1,
+                pointRadius: 8,
+                hoverRadius: 0,
+                hoverBorderWidth: 1
+            };
+            datasets.push(subject_data);
+        }
+        return datasets;
+    }
+
+    function show_graph(datasets, chart_title) {
+        Chart.defaults.color = '#000';
         const canvas_background_plugin = {
             id: 'custom_canvas_background_color',
             beforeDraw: (chart) => {
@@ -49,47 +81,10 @@ $(document).ready(function () {
             }
         };
 
-        var chart_data = [];
-        for (var i = 0; i < rows.length; i++) {
-            chart_data.push({
-                x: parseFloat(rows[i][0]),
-                y: parseFloat(rows[i][1]),
-                label: i + 1
-            });
-        }
-
-        var chart_data_2 = [];
-        for (var i = 0; i < rows_2.length; i++) {
-            chart_data_2.push({
-                x: parseFloat(rows_2[i][0]),
-                y: parseFloat(rows_2[i][1]),
-                label: i + 1
-            });
-        }
-
         const config = {
             type: 'bubble',
             data: {
-                datasets: [
-                    {
-                        label: 'Timeframe 1',
-                        data: chart_data,
-                        borderColor: CHART_COLORS.green,
-                        backgroundColor: CHART_COLORS.green,
-                        pointStyle: 'circle',
-                        pointRadius: 8,
-                        hoverRadius: 8
-                    },
-                    {
-                        label: 'Timeframe 2',
-                        data: chart_data_2,
-                        borderColor: CHART_COLORS.red,
-                        backgroundColor: CHART_COLORS.red,
-                        pointStyle: 'circle',
-                        pointRadius: 8,
-                        hoverRadius: 8
-                    }
-                ],
+                datasets: datasets,
             },
             options: {
                 animation: false,
@@ -119,7 +114,6 @@ $(document).ready(function () {
                             size: 18
                         }
                     },
-                    canvas_background_plugin,
                     tooltip: {
                         callbacks: {
                             label: function (context) {
@@ -127,11 +121,12 @@ $(document).ready(function () {
                                 return label;
                             }
                         }
-                    }
+                    },
                 }
             },
+            plugins: [canvas_background_plugin],
         };
-        Chart.defaults.color = '#000';
+
         const ctx = document.getElementById('visualization_div').getContext('2d');
 
         const old_chart = Chart.getChart(ctx);
@@ -146,16 +141,17 @@ $(document).ready(function () {
         let canvas_data, filename;
         const ctx = document.getElementById('visualization_div').getContext('2d');
         const current_chart = Chart.getChart(ctx);
+        filename_base = 'mds_graph';
         if (typeof current_chart !== 'undefined') {
             if (id === "jpeg_btn") {
                 canvas_data = current_chart.toBase64Image('image/jpeg', 1);
-                filename = "matrix_graph.jpg";
+                filename = filename_base + ".jpg";
             } else if (id === "png_btn") {
                 canvas_data = current_chart.toBase64Image();
-                filename = "matrix_graph.png";
+                filename = filename_base + ".png";
             } else if (id === "pdf_btn") {
                 const aspect_ratio = current_chart.width / current_chart.height;
-                filename = "matrix_graph.pdf";
+                filename = filename_base + ".pdf";
                 var pdf = new jsPDF('l', 'pt', 'a4');
                 const pdf_width = pdf.internal.pageSize.width;
                 const pdf_width_px = get_pdf_size(pdf_width, 'px');
@@ -176,14 +172,11 @@ $(document).ready(function () {
         }
     });
     $(".graph_data_btn").on("click", function () {
-        var subject_id = $('#subject_id')[0].value;
-        var data_path = 'subjects_mds/subject_' + subject_id + '.json';
-        var data = get_json_data(data_path);
-        var subject_id_2 = parseInt($('#subject_id')[0].value) + 1;
-        var data_path_2 = 'subjects_mds/subject_' + subject_id_2 + '.json';
-        var data_2 = get_json_data(data_path_2);
+        var subjects = $('#subject_id option:selected')
+            .toArray().map(item => item.value);
+        var datasets = get_datasets(subjects);
         $("#graph").hide();
-        show_graph(data, data_2, "MDS for Subject " + subject_id + ", " + subject_id_2);
+        show_graph(datasets, "MDS for selected subjects");
         $("#graph").show("slow");
     });
 
