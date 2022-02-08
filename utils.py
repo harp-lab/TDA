@@ -48,7 +48,13 @@ def get_dataset(filename='dataset_4_4.csv', v=100, generate=False, fmri=False):
         with open(filename) as fmri_file:
             fmri_reader = csv.reader(fmri_file, delimiter='\t')
             for line in fmri_reader:
-                values = [float(c.strip()) for c in line if c.strip() != ""]
+                values = []
+                for c in line:
+                    if c.strip() != "":
+                        val = float(c.strip())
+                        if np.isnan(val):
+                            val = 0
+                        values.append(val)
                 data.append(values)
         return data
     with open(filename) as csv_file:

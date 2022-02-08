@@ -12,7 +12,7 @@ import barcodes_ripser
 
 def demo():
     subject_number = 1
-    data_path = f'subjects_distance_matrix/subject_{subject_number}.json'
+    data_path = f'dfc_2500_subjects_distance_matrix/subject_{subject_number}.json'
 
     dissimilarity_matrix = np.array(json.loads(open(data_path, "r").read()))
     mds = get_mds(dissimilarity_matrix)
