@@ -79,7 +79,7 @@ $(document).ready(function () {
         let dfc_2500_data_path = 'dfc_2500_subjects_mds';
         let dfc_2500_data_label = 'DFC 2500: ';
         let dfc_1400_data_path = 'dfc_1400_subjects_mds';
-        let dfc_1400_data_label = 'DFC 1500: ';
+        let dfc_1400_data_label = 'DFC 1400: ';
         let fixed_color = false;
         let color_start = 0;
         if (subjects_1400.length + subjects_2500.length <= 6) {
