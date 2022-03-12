@@ -4,7 +4,7 @@ import json
 import numpy as np
 
 from utils import get_dataset, get_adjacency_for_triangle, draw_bars
-from mds_calculator import get_mds, plot_mds
+from mds_calculation import get_mds, plot_mds
 import barcodes_ripser
 
 # Driver code
