@@ -29,12 +29,6 @@ def get_dissimilarity_matrix(data_dir, subject_number, timeslots,
             filepath_1 = f'{data_dir}/{normalize_file_prefix}{subject_number}_time_{i}.txt'
             adjacency_matrix_1 = get_dataset(filename=filepath_1, fmri=True)
 
-            # import csv
-            #
-            # with open("adj1.csv", "w+") as my_csv:
-            #     csvWriter = csv.writer(my_csv, delimiter=',')
-            #     csvWriter.writerows(adjacency_matrix_1)
-
             ripser_barcodes_1 = barcodes_ripser.get_0_dim_barcodes(
                 adjacency_matrix_1,
                 max_value=1.0)
@@ -87,27 +81,27 @@ if __name__ == "__main__":
     # total_timeslots = 754
 
     # DFC 645
-    data_directory = "full_data/dfc_645_normal_partial"
-    json_directory = "dfc_645_subjects_distance_matrix"
-    mds_directory = "dfc_645_subjects_mds"
-    normalize_file_prefix = 'normalize_dfc_645_subject_'
-    total_subjects = 1
-    total_timeslots = 2
-
-    generate_distance_matrix(data_directory, json_directory,
-                             total_subjects, total_timeslots,
-                             normalize_file_prefix)
-    # generate_mds(mds_directory, json_directory, total_subjects)
-
-    # DFC 1400
-    # data_directory = "full_data/dfc_1400_normal_partial"
-    # json_directory = "dfc_1400_subjects_distance_matrix"
-    # mds_directory = "dfc_1400_subjects_mds"
-    # normalize_file_prefix = 'normalize_dfc_1400_subject_'
-    # total_subjects = 10
-    # total_timeslots = 336
+    # data_directory = "full_data/dfc_645_normal_partial"
+    # json_directory = "dfc_645_subjects_distance_matrix"
+    # mds_directory = "dfc_645_subjects_mds"
+    # normalize_file_prefix = 'normalize_dfc_645_subject_'
+    # total_subjects = 1
+    # total_timeslots = 2
     #
     # generate_distance_matrix(data_directory, json_directory,
     #                          total_subjects, total_timeslots,
     #                          normalize_file_prefix)
     # generate_mds(mds_directory, json_directory, total_subjects)
+
+    # DFC 1400
+    data_directory = "full_data/dfc_1400_normal_partial"
+    json_directory = "dfc_1400_subjects_distance_matrix"
+    mds_directory = "dfc_1400_subjects_mds"
+    normalize_file_prefix = 'normalize_dfc_1400_subject_'
+    total_subjects = 10
+    total_timeslots = 336
+
+    generate_distance_matrix(data_directory, json_directory,
+                             total_subjects, total_timeslots,
+                             normalize_file_prefix)
+    generate_mds(mds_directory, json_directory, total_subjects)
