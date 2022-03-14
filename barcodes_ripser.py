@@ -31,4 +31,4 @@ def get_0_dim_barcodes(matrix, max_value=1.0):
         else:
             value = round(bar[1], 2)
             barcodes.append([bar[0], value])
-    return barcodes
+    return np.array(barcodes)
