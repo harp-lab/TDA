@@ -44,12 +44,14 @@ def show_clusters(labels, unique_labels, dataset, title, index):
     plt.tight_layout()
 
 
-def generate_kmeans_clusters():
-    output_directory = "clusters_kmeans"
+def generate_kmeans_clusters(start_subject, end_subject, dfc_2500_mds_path,
+                             dfc_1400_mds_path,
+                             output_directory):
     cluster_info = {}
-    for i in range(1, 11):
-        datafile_2500 = f"visualizor/dfc_2500_subjects_mds/subject_{i}.json"
-        datafile_1400 = f"visualizor/dfc_1400_subjects_mds/subject_{i}.json"
+    for i in range(start_subject, end_subject + 1):
+        print(f"Generating cluster for Subject: {i}")
+        datafile_2500 = f"{dfc_2500_mds_path}/subject_{i}.json"
+        datafile_1400 = f"{dfc_1400_mds_path}/dfc_1400_subjects_mds/subject_{i}.json"
         dataset_2500 = get_dataset(datafile_2500)
         dataset_1400 = get_dataset(datafile_1400)
         labels_2500 = get_labels_highest_score(dataset_2500)
@@ -69,9 +71,12 @@ def generate_kmeans_clusters():
         plt.tight_layout()
         plt.savefig(image_name, dpi=150)
         plt.close()
+        print(f"Generated cluster for Subject: {i}\n")
     with open(f"{output_directory}/clusters.json", "w") as json_file:
         json.dump(cluster_info, json_file)
     print(cluster_info)
+    print(f"Done. Generated clusters: subject {start_subject} - {end_subject}")
+
 
 def generate_optics_clusters():
     output_directory = "clusters_optics"
@@ -105,6 +110,12 @@ def generate_optics_clusters():
         json.dump(cluster_info, json_file)
     print(cluster_info)
 
+
 if __name__ == "__main__":
-    # generate_kmeans_clusters()
-    generate_optics_clusters()
+    dfc_2500_mds_path = "dfc_2500_subjects_mds"
+    dfc_1400_mds_path = "dfc_1400_subjects_mds"
+    output_directory = "clusters_kmeans"
+    start_subject = 1
+    end_subject = 316
+    generate_kmeans_clusters(start_subject, end_subject, dfc_2500_mds_path,
+                             dfc_1400_mds_path, output_directory)
