@@ -56,8 +56,9 @@ scp -r ashovon@cheaha.rc.uab.edu:/home/ashovon/newaumri/matfiles/analysis/cluste
 ```
 - Run bash script in background:
 ```
-nohup sh -u run_bg.sh > wasserstein.log &
-nohup sh -u run_bg.sh > clusters.log &
+nohup sh run_bg.sh > wasserstein.log &
+nohup sh run_bg.sh > clusters.log &
+nohup sh run_bg.sh > dfc_645.log &
 ```
 - See the running scripts for the user:
 ```

@@ -103,17 +103,28 @@ if __name__ == "__main__":
     # generate_mds(mds_directory, json_directory, total_subjects)
 
     # DFC 1400
-    data_directory = "../dfc_1400_normal"
-    json_directory = "dfc_1400_subjects_distance_matrix"
-    mds_directory = "dfc_1400_subjects_mds"
-    normalize_file_prefix = 'normalize_dfc_1400_subject_'
-    total_subjects = 306
-    start_subject = 11
-    end_subject = 231
-    total_timeslots = 336
+    # data_directory = "../dfc_1400_normal"
+    # json_directory = "dfc_1400_subjects_distance_matrix"
+    # mds_directory = "dfc_1400_subjects_mds"
+    # normalize_file_prefix = 'normalize_dfc_1400_subject_'
+    # total_subjects = 306
+    # start_subject = 11
+    # end_subject = 231
+    # total_timeslots = 336
 
-    # generate_distance_matrix(data_directory, json_directory,
-    #                          total_subjects, total_timeslots,
-    #                          normalize_file_prefix, start_subject, end_subject)
+    # DFC 645
+    data_directory = "../dfc_645_normal_update"
+    json_directory = "dfc_645_subjects_distance_matrix"
+    mds_directory = "dfc_645_subjects_mds"
+    normalize_file_prefix = 'normalize_dfc_645_subject_'
+    total_subjects = 316
+    start_subject = 1
+    end_subject = 316
+    total_timeslots = 754
+
+
+    generate_distance_matrix(data_directory, json_directory,
+                             total_subjects, total_timeslots,
+                             normalize_file_prefix, start_subject, end_subject)
     generate_mds(mds_directory, json_directory, total_subjects, start_subject,
                  end_subject)
