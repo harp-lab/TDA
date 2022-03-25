@@ -64,3 +64,21 @@ nohup sh run_bg.sh > dfc_645.log &
 ```
 ps aux | grep ashovon
 ```
+
+### Clustering Results
+
+![Clustering result between DFC 2500 and DFC 1400](../../screenshots/clustering_result.png)
+
+Figure 1: Clustering result between DFC 2500 and DFC 1400
+
+![Clustering sample 1](clusters_kmeans/subject_1.png)
+
+Figure 2: Clustering result of subject 1 for DFC 2500 and DFC 1400
+
+![Clustering sample 2](clusters_kmeans/subject_39.png)
+
+Figure 3: Clustering result of subject 39 for DFC 2500 and DFC 1400
+
+![Clustering sample 63](clusters_kmeans/subject_63.png)
+
+Figure 4: Clustering result of subject 63 for DFC 2500 and DFC 1400
