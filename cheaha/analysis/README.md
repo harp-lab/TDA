@@ -53,6 +53,8 @@ scp -r ashovon@cheaha.rc.uab.edu:/home/ashovon/newaumri/matfiles/analysis/cluste
 ```
 scp -r ashovon@cheaha.rc.uab.edu:/home/ashovon/newaumri/matfiles/analysis/ .
 scp -r ashovon@cheaha.rc.uab.edu:/home/ashovon/newaumri/matfiles/analysis/clusters_kmeans .
+scp -r ashovon@cheaha.rc.uab.edu:/home/ashovon/newaumri/matfiles/analysis .
+
 ```
 - Run bash script in background:
 ```
