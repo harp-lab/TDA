@@ -1,6 +1,7 @@
 import random
 import csv
 import numpy as np
+from time import time
 
 
 def get_adjacency_for_triangle(triangular_matrix, lower=True):
@@ -80,3 +81,33 @@ def generate_large_dataset(v=100, filename='large_dataset.csv'):
         csv_writer = csv.writer(csv_file, delimiter=',')
         csv_writer.writerows(ar)
     return ar
+
+
+def timer(func):
+    def inner(*args, **kwargs):
+        start_time = time()
+        result = func(*args, **kwargs)
+        end_time = time()
+        total_time = end_time - start_time
+        print(f"Method {func.__name__}({args}, {kwargs}) executed in {total_time:.4f} seconds\n")
+        return result
+
+    return inner
+
+
+@timer
+def sample_method(x, y, add=None):
+    for i in range(10**6):
+        if add == True:
+            x += y
+        else:
+            x -= y
+    return x
+
+
+if __name__ == "__main__":
+    z = sample_method(50, 6)
+    print(z)
+
+    z = sample_method(5, 6, add=True)
+    print(z)

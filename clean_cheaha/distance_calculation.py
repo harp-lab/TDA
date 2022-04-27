@@ -2,15 +2,16 @@ import json
 import gudhi
 import gudhi.wasserstein
 import numpy as np
-from utils import get_dataset
+from utils import get_dataset, timer
 from mds_calculation import get_mds
-
+import os
 
 def get_wasserstein_distance_gudhi(dgm_1, dgm_2):
     return gudhi.wasserstein.wasserstein_distance(dgm_1, dgm_2,
                                                   order=1., internal_p=2.)
 
 
+@timer
 def get_mds_matrix(subject_id, json_directory):
     data_path = f'{json_directory}/subject_{subject_id}.json'
     dissimilarity_matrix = np.array(json.loads(open(data_path, "r").read()))
@@ -18,9 +19,10 @@ def get_mds_matrix(subject_id, json_directory):
     return json.dumps(mds_matrix.tolist())
 
 
+@timer
 def get_dissimilarity_matrix(data_dir, subject_number, timeslots,
                              normalize_file_prefix):
-    dissimilarity_matrix = np.array([[0 for j in range(timeslots)] for i in
+    dissimilarity_matrix = np.array([[0.0 for j in range(timeslots)] for i in
                                      range(timeslots)])
     barcodes = {}
     for i in range(1, timeslots + 1):
@@ -52,32 +54,37 @@ def get_dissimilarity_matrix(data_dir, subject_number, timeslots,
             dissimilarity_matrix[j - 1][i - 1] = distance
     return dissimilarity_matrix
 
-
-def generate_distance_matrix(data_dir, generated_json_directory,
+@timer
+def generate_distance_matrix(data_dir, distance_directory,
                              total_subjects, total_timeslots,
                              normalize_file_prefix, start_subject=None,
                              end_subject=None):
+    if not os.path.exists(distance_directory):
+        os.makedirs(distance_directory)
     if start_subject == None:
         start_subject = 1
         end_subject = total_subjects
     for subject_number in range(start_subject, end_subject + 1):
         print(f"Generating distance matrix for Subject {subject_number}")
-        generated_json = f'{generated_json_directory}/subject_{subject_number}.json'
+        generated_json = f'{distance_directory}/subject_{subject_number}.json'
         dissimilarity_matrix = get_dissimilarity_matrix(data_dir,
                                                         subject_number,
                                                         total_timeslots,
                                                         normalize_file_prefix)
+        # print(dissimilarity_matrix)
         with open(generated_json, "w") as f:
             json.dump(dissimilarity_matrix.tolist(), f)
-            print(
-                f"Wasserstein distance JSON created for Subject {subject_number}")
+            print(f"Wasserstein distance JSON created for Subject {subject_number}")
     print("Done generating the Wasserstein distance matrix JSON files")
 
 
+@timer
 def generate_mds(mds_directory, json_directory, total_subjects,
                  start_subject=None,
                  end_subject=None
                  ):
+    if not os.path.exists(mds_directory):
+        os.makedirs(mds_directory)
     if start_subject == None:
         start_subject = 1
         end_subject = total_subjects
@@ -131,16 +138,16 @@ if __name__ == "__main__":
     # end_subject = 316
     # total_timeslots = 754
     data_directory = "../fmri_data"
-    json_directory = "dfc_2500_1_subjects_distance_matrix"
-    mds_directory = "dfc_2500_1_subjects_mds"
+    distance_matrix_directory = "dfc_2500_subjects_distance_matrix"
+    mds_directory = "dfc_2500_subjects_mds"
     normalize_file_prefix = 'normalize_dfc_2500_subject_'
     total_subjects = 1
     start_subject = 1
     end_subject = 1
     total_timeslots = 86
 
-    generate_distance_matrix(data_directory, json_directory,
+    generate_distance_matrix(data_directory, distance_matrix_directory,
                              total_subjects, total_timeslots,
                              normalize_file_prefix, start_subject, end_subject)
-    generate_mds(mds_directory, json_directory, total_subjects, start_subject,
+    generate_mds(mds_directory, distance_matrix_directory, total_subjects, start_subject,
                  end_subject)
