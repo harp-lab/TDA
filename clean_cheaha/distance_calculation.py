@@ -1,5 +1,5 @@
 import json
-import barcodes_ripser
+import gudhi
 import gudhi.wasserstein
 import numpy as np
 from utils import get_dataset
@@ -21,23 +21,32 @@ def get_mds_matrix(subject_id, json_directory):
 def get_dissimilarity_matrix(data_dir, subject_number, timeslots,
                              normalize_file_prefix):
     dissimilarity_matrix = np.array([[0 for j in range(timeslots)] for i in
-                            range(timeslots)])
+                                     range(timeslots)])
+    barcodes = {}
     for i in range(1, timeslots + 1):
-        filepath_1 = f'{data_dir}/{normalize_file_prefix}{subject_number}_time_{i}.txt'
-        adjacency_matrix_1 = get_dataset(filename=filepath_1, fmri=True)
-
-        ripser_barcodes_1 = barcodes_ripser.get_0_dim_barcodes(
-            adjacency_matrix_1,
-            max_value=1.0)
+        time_1 = f"time_{i}"
+        if time_1 not in barcodes:
+            filepath_1 = f'{data_dir}/{normalize_file_prefix}{subject_number}_time_{i}.txt'
+            adjacency_matrix_1 = get_dataset(filename=filepath_1, fmri=True)
+            rips_complex_1 = gudhi.RipsComplex(distance_matrix=adjacency_matrix_1)
+            pd_1 = rips_complex_1.create_simplex_tree(max_dimension=1).persistence()[1:]
+            barcodes_1 = np.array([pair[1] for pair in pd_1])
+            barcodes[time_1] = barcodes_1
+        else:
+            barcodes_1 = barcodes[time_1]
         for j in range(1, i):
-            filepath_2 = f'{data_dir}/{normalize_file_prefix}{subject_number}_time_{j}.txt'
-            adjacency_matrix_2 = get_dataset(filename=filepath_2, fmri=True)
-            ripser_barcodes_2 = barcodes_ripser.get_0_dim_barcodes(
-                adjacency_matrix_2,
-                max_value=1.0)
-
-            distance = get_wasserstein_distance_gudhi(ripser_barcodes_1,
-                                                      ripser_barcodes_2)
+            time_2 = f"time_{j}"
+            if time_2 not in barcodes:
+                filepath_2 = f'{data_dir}/{normalize_file_prefix}{subject_number}_time_{j}.txt'
+                adjacency_matrix_2 = get_dataset(filename=filepath_2, fmri=True)
+                rips_complex_2 = gudhi.RipsComplex(distance_matrix=adjacency_matrix_2)
+                pd_2 = rips_complex_2.create_simplex_tree(max_dimension=1).persistence()[1:]
+                barcodes_2 = np.array([pair[1] for pair in pd_2])
+                barcodes[time_2] = barcodes_2
+            else:
+                barcodes_2 = barcodes[time_2]
+            distance = get_wasserstein_distance_gudhi(barcodes_1,
+                                                      barcodes_2)
             distance = round(distance, 3)
             dissimilarity_matrix[i - 1][j - 1] = distance
             dissimilarity_matrix[j - 1][i - 1] = distance
@@ -51,7 +60,7 @@ def generate_distance_matrix(data_dir, generated_json_directory,
     if start_subject == None:
         start_subject = 1
         end_subject = total_subjects
-    for subject_number in range(start_subject, end_subject+1):
+    for subject_number in range(start_subject, end_subject + 1):
         print(f"Generating distance matrix for Subject {subject_number}")
         generated_json = f'{generated_json_directory}/subject_{subject_number}.json'
         dissimilarity_matrix = get_dissimilarity_matrix(data_dir,
@@ -72,7 +81,7 @@ def generate_mds(mds_directory, json_directory, total_subjects,
     if start_subject == None:
         start_subject = 1
         end_subject = total_subjects
-    for subject_number in range(start_subject, end_subject+1):
+    for subject_number in range(start_subject, end_subject + 1):
         generated_mds = f'{mds_directory}/subject_{subject_number}.json'
         mds_matrix = get_mds_matrix(subject_number, json_directory)
         with open(generated_mds, "w") as f:
