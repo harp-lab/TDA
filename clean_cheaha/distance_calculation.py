@@ -6,6 +6,7 @@ from utils import get_dataset, timer
 from mds_calculation import get_mds
 import os
 
+
 def get_wasserstein_distance_gudhi(dgm_1, dgm_2):
     return gudhi.wasserstein.wasserstein_distance(dgm_1, dgm_2,
                                                   order=1., internal_p=2.)
@@ -20,8 +21,8 @@ def get_mds_matrix(subject_id, json_directory):
 
 
 @timer
-def get_dissimilarity_matrix(data_dir, subject_number, timeslots,
-                             normalize_file_prefix):
+def get_distance_matrix(data_dir, subject_number, timeslots,
+                        normalize_file_prefix):
     dissimilarity_matrix = np.array([[0.0 for j in range(timeslots)] for i in
                                      range(timeslots)])
     barcodes = {}
@@ -30,8 +31,10 @@ def get_dissimilarity_matrix(data_dir, subject_number, timeslots,
         if time_1 not in barcodes:
             filepath_1 = f'{data_dir}/{normalize_file_prefix}{subject_number}_time_{i}.txt'
             adjacency_matrix_1 = get_dataset(filename=filepath_1, fmri=True)
-            rips_complex_1 = gudhi.RipsComplex(distance_matrix=adjacency_matrix_1)
-            pd_1 = rips_complex_1.create_simplex_tree(max_dimension=1).persistence()[1:]
+            rips_complex_1 = gudhi.RipsComplex(
+                distance_matrix=adjacency_matrix_1)
+            pd_1 = rips_complex_1.create_simplex_tree(
+                max_dimension=1).persistence()[1:]
             barcodes_1 = np.array([pair[1] for pair in pd_1])
             barcodes[time_1] = barcodes_1
         else:
@@ -40,9 +43,12 @@ def get_dissimilarity_matrix(data_dir, subject_number, timeslots,
             time_2 = f"time_{j}"
             if time_2 not in barcodes:
                 filepath_2 = f'{data_dir}/{normalize_file_prefix}{subject_number}_time_{j}.txt'
-                adjacency_matrix_2 = get_dataset(filename=filepath_2, fmri=True)
-                rips_complex_2 = gudhi.RipsComplex(distance_matrix=adjacency_matrix_2)
-                pd_2 = rips_complex_2.create_simplex_tree(max_dimension=1).persistence()[1:]
+                adjacency_matrix_2 = get_dataset(filename=filepath_2,
+                                                 fmri=True)
+                rips_complex_2 = gudhi.RipsComplex(
+                    distance_matrix=adjacency_matrix_2)
+                pd_2 = rips_complex_2.create_simplex_tree(
+                    max_dimension=1).persistence()[1:]
                 barcodes_2 = np.array([pair[1] for pair in pd_2])
                 barcodes[time_2] = barcodes_2
             else:
@@ -53,6 +59,7 @@ def get_dissimilarity_matrix(data_dir, subject_number, timeslots,
             dissimilarity_matrix[i - 1][j - 1] = distance
             dissimilarity_matrix[j - 1][i - 1] = distance
     return dissimilarity_matrix
+
 
 @timer
 def generate_distance_matrix(data_dir, distance_directory,
@@ -67,14 +74,14 @@ def generate_distance_matrix(data_dir, distance_directory,
     for subject_number in range(start_subject, end_subject + 1):
         print(f"Generating distance matrix for Subject {subject_number}")
         generated_json = f'{distance_directory}/subject_{subject_number}.json'
-        dissimilarity_matrix = get_dissimilarity_matrix(data_dir,
-                                                        subject_number,
-                                                        total_timeslots,
-                                                        normalize_file_prefix)
-        # print(dissimilarity_matrix)
+        dissimilarity_matrix = get_distance_matrix(data_dir,
+                                                   subject_number,
+                                                   total_timeslots,
+                                                   normalize_file_prefix)
         with open(generated_json, "w") as f:
             json.dump(dissimilarity_matrix.tolist(), f)
-            print(f"Wasserstein distance JSON created for Subject {subject_number}")
+            print(
+                f"Wasserstein distance JSON created for Subject {subject_number}")
     print("Done generating the Wasserstein distance matrix JSON files")
 
 
@@ -95,6 +102,25 @@ def generate_mds(mds_directory, json_directory, total_subjects,
             json.dump(mds_matrix, f)
             print(f"MDS JSON created for Subject {subject_number}")
     print("Done generating the MDS JSON files")
+
+
+@timer
+def main():
+    # DFC 1400
+    data_directory = "../dfc_1400_normal"
+    distance_matrix_directory = "dfc_1400_subjects_distance_matrix"
+    mds_directory = "dfc_1400_subjects_mds"
+    normalize_file_prefix = 'normalize_dfc_1400_subject_'
+    total_subjects = 306
+    start_subject = 11
+    end_subject = 231
+    total_timeslots = 336
+    generate_distance_matrix(data_directory, distance_matrix_directory,
+                             total_subjects, total_timeslots,
+                             normalize_file_prefix, start_subject, end_subject)
+    generate_mds(mds_directory, distance_matrix_directory, total_subjects,
+                 start_subject,
+                 end_subject)
 
 
 if __name__ == "__main__":
@@ -137,17 +163,18 @@ if __name__ == "__main__":
     # start_subject = 1
     # end_subject = 316
     # total_timeslots = 754
-    data_directory = "../fmri_data"
-    distance_matrix_directory = "dfc_2500_subjects_distance_matrix"
-    mds_directory = "dfc_2500_subjects_mds"
-    normalize_file_prefix = 'normalize_dfc_2500_subject_'
-    total_subjects = 1
-    start_subject = 1
-    end_subject = 1
-    total_timeslots = 86
-
-    generate_distance_matrix(data_directory, distance_matrix_directory,
-                             total_subjects, total_timeslots,
-                             normalize_file_prefix, start_subject, end_subject)
-    generate_mds(mds_directory, distance_matrix_directory, total_subjects, start_subject,
-                 end_subject)
+    # data_directory = "../fmri_data"
+    # distance_matrix_directory = "dfc_2500_subjects_distance_matrix"
+    # mds_directory = "dfc_2500_subjects_mds"
+    # normalize_file_prefix = 'normalize_dfc_2500_subject_'
+    # total_subjects = 1
+    # start_subject = 1
+    # end_subject = 1
+    # total_timeslots = 86
+    #
+    # generate_distance_matrix(data_directory, distance_matrix_directory,
+    #                          total_subjects, total_timeslots,
+    #                          normalize_file_prefix, start_subject, end_subject)
+    # generate_mds(mds_directory, distance_matrix_directory, total_subjects, start_subject,
+    #              end_subject)
+    main()

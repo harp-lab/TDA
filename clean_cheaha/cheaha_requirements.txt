@@ -12,7 +12,6 @@ Pillow==8.4.0
 POT==0.8.0
 pyparsing==3.0.7
 python-dateutil==2.8.2
-ripser==0.6.1
 scikit-learn==0.24.2
 scipy==1.5.4
 six==1.16.0
