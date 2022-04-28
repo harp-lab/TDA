@@ -108,12 +108,12 @@ def generate_mds(mds_directory, json_directory, total_subjects,
 def main():
     # DFC 1400
     data_directory = "../dfc_1400_normal"
-    distance_matrix_directory = "dfc_1400_subjects_distance_matrix"
-    mds_directory = "dfc_1400_subjects_mds"
+    distance_matrix_directory = "../dfc_1400_subjects_distance_matrix"
+    mds_directory = "../dfc_1400_subjects_mds"
     normalize_file_prefix = 'normalize_dfc_1400_subject_'
-    total_subjects = 306
-    start_subject = 11
-    end_subject = 231
+    total_subjects = 316
+    start_subject = 1
+    end_subject = 316
     total_timeslots = 336
     generate_distance_matrix(data_directory, distance_matrix_directory,
                              total_subjects, total_timeslots,
