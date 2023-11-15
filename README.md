@@ -1,14 +1,12 @@
 # TDA
 
 TDA and Persistent homology
+![0-dimensional barcodes](screenshots/demo_data.png)
 
-## Barcode generator
-
-![0-dimensional barcodes](screenshots/matrix_4_4.png)
-
+# Python App
 ## Features
 
-- Currently, the generator is able to generate 0-dimensional barcodes chart for a given adjacency matrix of a point
+- Generates 0-dimensional barcodes chart for a given adjacency matrix of a point
   cloud.
 - Generates and stores `n * n` adjacency matrix in a CSV file.
 - Load adjacency matrix from CSV file to generate barcodes. Several dummy datasets are included in the repository.
@@ -26,6 +24,7 @@ TDA and Persistent homology
 - Create a virtual environment and activate it. If you are using Linux / Mac:
 
 ```commandline
+cd python_app
 python3 -m venv venv
 source venv/bin/activate
 ```
@@ -126,12 +125,13 @@ python main.py --data time_varying_4_4.csv --matrix
 Our generator provides 0-dimensional barcodes similar to Ripser generator. The following table shows the isomorphic
 barcodes for identical datasets.
 
-| Matrix size | Barcode generator | Ripser generator|
-| --- | --- | --- |
-| 4x4 | ![4x4](screenshots/matrix_4_4.png) | ![4x4](screenshots/matrix_4_4_ripser.png) |
-| 10x10 | ![10x10](screenshots/matrix_10_10.png) | ![10x10](screenshots/matrix_10_10_ripser.png) |
-| 20x20 | ![20x20](screenshots/matrix_20_20.png) | ![20x20](screenshots/matrix_20_20_ripser.png) |
-| 100x100 | ![100x100](screenshots/matrix_100_100.png) | ![100x100](screenshots/matrix_100_100_ripser.png) |
+| Matrix size | Barcode generator                          | Ripser generator                                  |
+|-------------|--------------------------------------------|---------------------------------------------------|
+| 4x4         | ![4x4](screenshots/matrix_4_4.png)         | ![4x4](screenshots/matrix_4_4_ripser.png)         |
+| 10x10       | ![10x10](screenshots/matrix_10_10.png)     | ![10x10](screenshots/matrix_10_10_ripser.png)     |
+| 20x20       | ![20x20](screenshots/matrix_20_20.png)     | ![20x20](screenshots/matrix_20_20_ripser.png)     |
+| 100x100     | ![100x100](screenshots/matrix_100_100.png) | ![100x100](screenshots/matrix_100_100_ripser.png) |
+| demo data   | ![demo data](screenshots/demo_data.png)    | ![demo data](screenshots/ripser_demo_data.png)    |
 
 ## Reports
 
@@ -139,7 +139,7 @@ Details report of the project can be found in the [reports directory](reports/).
 
 ## Changelog
 
-Changelog of the project is listed in [Changelog.md](Changelog.md) file. The following commmand will generate new
+Changelog of the project is listed in [Changelog.md](python_app/Changelog.md) file. The following commmand will generate new
 changelog based on commit messages:
 
 ```commandline

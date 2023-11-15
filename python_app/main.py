@@ -6,7 +6,7 @@ import os, argparse
 # Driver code
 
 def demo():
-    adjacency_matrix = get_dataset(filename="dataset_100_100.csv")
+    adjacency_matrix = get_dataset(filename="../data/dataset_100_100.csv")
     barcodes = get_barcodes(adjacency_matrix)
     draw_barcode_only(barcodes, adjacency_matrix)
 
