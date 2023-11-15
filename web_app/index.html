@@ -2,162 +2,152 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Barcodes</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"
             integrity="sha512-M7nHCiNUOwFt6Us3r8alutZLm9qMt4s9951uo8jqO4UwJ1hziseL6O3ndFyigx6+LREfZqnhHxYjKRJ8ZQ69DQ=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description"
+          content="0 dim barcodes visualization">
+    <meta name="author" content="Ahmedur Rahman Shovon">
+    <meta name="keywords"
+          content="barcodes">
+    <link rel="canonical"
+          href="/"/>
+
+    <title>0 dim barcodes visualization</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
 </head>
-<body>
-<div id="barcodes"></div>
-<script>
 
-    function get_unique_distances(matrix) {
-        const unique_distances = new Set();
-        for (let i = 0; i < matrix.length; i++) {
-            for (let j = i + 1; j < matrix.length; j++) {
-                unique_distances.add(matrix[i][j]);
-            }
-        }
-        const distances = Array.from(unique_distances);
-        distances.sort();
-        return distances;
-    }
+<body class="d-flex flex-column min-vh-100 bg-light bg-gradient">
+<div class="container p-3 bg-white">
+    <header>
+        <!--Header Starts-->
+        <div class="d-flex flex-column flex-md-row align-items-start pb-3 mb-4 border-bottom">
+            <a href=""
+               class="d-flex align-items-center text-dark text-decoration-none me-4"
+               data-bs-toggle="tooltip" data-bs-placement="bottom"
+               title="{{config.SITE_NAME_SHORT}}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+                     fill="currentColor" class="bi bi-collection"
+                     viewBox="0 0 16 16">
+                    <path d="M2.5 3.5a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm2-2a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1h-7zM0 13a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 16 13V6a1.5 1.5 0 0 0-1.5-1.5h-13A1.5 1.5 0 0 0 0 6v7zm1.5.5A.5.5 0 0 1 1 13V6a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13z"/>
+                </svg>
+                &nbsp;
+                <span class="fs-4">Barcodes</span>
+            </a>
+            <a class="me-3 py-2 text-dark text-decoration-none"
+               href="" data-bs-toggle="tooltip"
+               data-bs-placement="bottom" title="Show all panels">
+                <i class="bi bi-journals"></i> Home
+            </a>
+            <!--            <a class="me-3 py-2 text-dark text-decoration-none"-->
+            <!--               href=""-->
+            <!--               data-bs-toggle="tooltip" data-bs-placement="bottom"-->
+            <!--               title="Add a new panel">-->
+            <!--                <i class="bi bi-journal-plus"></i> Add Panel-->
+            <!--            </a>-->
+            <!--            <a class="me-3 py-2 text-dark text-decoration-none"-->
+            <!--               href="" data-bs-toggle="tooltip"-->
+            <!--               data-bs-placement="bottom" title="Show my panels">-->
+            <!--                <i class="bi bi-person-workspace"></i> My Panels-->
+            <!--            </a>-->
 
-    function get_components(matrix, min_distance) {
-        const components = [];
-        const number_of_nodes = matrix.length;
-        const seen = new Set();
-        for (let i = 0; i < number_of_nodes; i++) {
-            if (!seen.has(i)) {
-                let component = [];
-                let visited = new Array(number_of_nodes).fill(false);
-                let queue = [i];
-                visited[i] = true;
-                while (queue.length !== 0) {
-                    const current_node = queue.shift();
-                    seen.add(current_node);
-                    component.push(current_node);
-                    for (let node = 0; node < number_of_nodes; node++) {
-                        if (visited[node] === false && (matrix[current_node][node] <= min_distance)) {
-                            queue.push(node);
-                            visited[node] = true;
-                        }
-                    }
-                }
-                components.push(component);
-            }
-        }
-        return components;
-    }
+            <!--            <nav class="d-lg-flex mt-2 mt-lg-0 ms-lg-auto">-->
+            <!--                <a class="align-middle m-auto btn btn-outline-dark btn-sm me-1 text-decoration-none"-->
+            <!--                   href=""-->
+            <!--                   data-bs-toggle="tooltip" data-bs-placement="bottom"-->
+            <!--                   title="Login">-->
+            <!--                    <i class="bi bi-box-arrow-in-right"></i> Login-->
+            <!--                </a>-->
+            <!--                <a class="align-middle m-auto btn btn-outline-success btn-sm text-decoration-none"-->
+            <!--                   href=""-->
+            <!--                   data-bs-toggle="tooltip" data-bs-placement="bottom"-->
+            <!--                   title="Sign up">-->
+            <!--                    <i class="bi bi-person-add"></i> Sign Up-->
+            <!--                </a>-->
+            <!--            </nav>-->
+        </div>
+        <!--Header Ends-->
+    </header>
+    <main>
+        <div class="row pb-4">
+            <div class="col">
+                <h2 class="pb-2 border-bottom">
+                    0 Dimensional Persistent Barcodes Visualization
+                </h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <h3>0 dimensional barcode</h3>
+                <div id="barcodes"></div>
+            </div>
+            <div class="col-6">
+                <h3>Show connected network</h3>
+                <div id="fcn">
 
-    async function get_data() {
-        let data_file = "../data/fmri_data/normalize_dfc_2500_subject_1_time_1.txt";
-        // data_file = "../data/demo_data.txt";
-        data_file = "../data/time_varying_4_4.csv";
-        return d3.text(data_file).then(function (text) {
-            let matrix;
-            if (data_file.endsWith("csv")) {
-                matrix = d3.csvParseRows(text, (row) => row.map((value) => +value));
-            } else {
-                matrix = d3.tsvParseRows(text, (row) => row.map((value) => +value));
-            }
-            return matrix;
-        });
-    }
+                </div>
+                <div id="fcn_graph">
 
-    function get_0_dim_barcodes(matrix) {
-        const number_of_nodes = matrix.length;
-        let barcodes = [];
-        const unique_distances = get_unique_distances(matrix);
-        const max_distance = unique_distances[unique_distances.length - 1];
-        let prev_number_of_components = -1;
-        for (let i = 0; i < unique_distances.length; i++) {
-            const distance = unique_distances[i];
-            const components = get_components(matrix, distance);
-            const number_of_components = components.length;
-            if (number_of_components === 1) {
-                barcodes.push([0, distance, components]);
-                break;
-            }
-            if (prev_number_of_components === -1) {
-                prev_number_of_components = number_of_components;
-                barcodes.push([0, distance, components]);
-                continue;
-            }
-            if (number_of_components < prev_number_of_components) {
-                for (let i = 0; i < (prev_number_of_components - number_of_components); i++) {
-                    barcodes.push([0, distance, components]);
-                }
-                prev_number_of_components = number_of_components;
-            }
-        }
-        const remaining_bars = number_of_nodes - barcodes.length;
-        const components = get_components(matrix, max_distance);
-        for (let i = 0; i < remaining_bars; i++) {
-            barcodes.push([0, max_distance, components]);
-        }
-        return barcodes;
-    }
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+<footer class="py-3 bg-dark mt-auto text-white border border-top border-2 border-dark">
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-6">
+                <p class="mb-1">Developed by <a href="https://arshovon.com/"
+                                                class="text-white"
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top"
+                                                title="Developer profile">Shovon</a>
+                    <br>Barcodes &copy; 2023
+                </p>
+            </div>
+            <div class="col-12 col-lg-6 text-lg-end">
+                <a class="me-3 py-2 text-white text-decoration-none" href=""
+                   data-bs-toggle="tooltip"
+                   data-bs-placement="top" title="Read terms">
+                    <i class="bi-info-square"></i> Terms
+                </a>
+                <a class="me-3 py-2 text-white text-decoration-none" href=""
+                   data-bs-toggle="tooltip"
+                   data-bs-placement="top" title="Learn more about us">
+                    <i class="bi-people"></i> About
+                </a>
+                <a class="me-3 py-2 text-white text-decoration-none"
+                   target="_blank"
+                   href="https://github.com/harp-lab/tda"
+                   data-bs-toggle="tooltip" data-bs-placement="top"
+                   title="Open code repository">
+                    <i class="bi-github"></i> Code
+                </a>
+            </div>
+            <div class="fixed-bottom">
+                <a id="back-to-top" href="#" data-bs-toggle="tooltip"
+                   data-bs-placement="top" title="Go to top"
+                   class="btn btn-light btn-lg back-to-top float-end" role="button">
+                    <i class="bi bi-arrow-up-square-fill"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</footer>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
+        integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
 
-    function show_barcode(data) {
-
-        // Declare the chart dimensions and margins.
-        const width = 500;
-        const marginTop = 20;
-        const marginRight = 20;
-        const marginBottom = 20;
-        const marginLeft = 20;
-        const barHeight = 10; // Fixed height for the bars
-        // Calculate the height of the SVG container based on the number of bars
-        const height = data.length * (barHeight + 5) + marginTop + marginBottom;
-        const padding = 5;
-        // Sort data by the second element of each sub-array (largest to smallest)
-        data.sort((a, b) => b[1] - a[1]);
-        // Calculate the maximum value in the data array
-        const maxValue = d3.max(data, d => d[1]);
-
-        // Create scales for x and y axes
-        const xScale = d3.scaleLinear()
-            .domain([0, maxValue])
-            .range([marginLeft, width]);
-
-        const yScale = d3.scaleBand()
-            .domain(d3.range(data.length))
-            .range([marginTop+padding, height - marginBottom])
-            .padding(0.1);
-
-        // Create the SVG container.
-        const svg = d3.create("svg")
-            .attr("width", width)
-            .attr("height", height);
-
-        // Create horizontal bars
-        svg.selectAll("rect")
-            .data(data)
-            .enter().append("rect")
-            .attr("x", marginLeft)
-            .attr("y", (d, i) => yScale(i))
-            .attr("width", d => xScale(d[1]))
-            .attr("height", barHeight)
-            .attr("fill", "steelblue");
-
-        // Add the x-axis.
-        svg.append("g")
-            .attr("transform", `translate(0,${marginTop})`)
-            .call(d3.axisTop(xScale));
-
-        // Select the container with id "barcodes"
-        const container = d3.select("#barcodes");
-
-        // Append the SVG element to the container
-        container.node().append(svg.node());
-    }
-
-    get_data().then(function (matrix) {
-        const data = get_0_dim_barcodes(matrix);
-        show_barcode(data);
-    });
-
+<script src="barcodes.js">
 </script>
+
 </body>
 </html>
