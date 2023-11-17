@@ -37,7 +37,7 @@ function get_components(matrix, min_distance) {
     return components;
 }
 
-async function get_data() {
+async function get_static_data() {
     let data_file = "../data/fmri_data/normalize_dfc_2500_subject_1_time_1.txt";
     // data_file = "../data/demo_data.txt";
     // data_file = "../data/time_varying_4_4.csv";
@@ -135,6 +135,7 @@ function show_barcode(data) {
         .attr("height", bar_height)
         .attr("fill", bar_color)
         .attr("clicked", "false")
+        .attr("class", "bar")
         .on("mouseover", function (event, d) {
             const current_element = d3.select(this);
             if (current_element.attr("clicked") === "false") {
@@ -167,13 +168,15 @@ function show_barcode(data) {
             // d3.select(this).attr("fill", bar_click_color);
             const current_element = d3.select(this);
             if (current_element.attr("clicked") === "false") {
+                $(".bar").attr("fill", bar_color);
+                $(".bar").attr("clicked", "false");
                 current_element.attr("fill", bar_click_color);
                 current_element.attr("clicked", "true");
                 const bar_end = d3.format(".3f")(d[1]);
                 const msg = `[${d[0]}, ${bar_end}), ${d[2].length} components`;
                 $("#fcn").text(msg);
             } else {
-                current_element.attr("fill", bar_click_color);
+                current_element.attr("fill", bar_color);
                 current_element.attr("clicked", "false");
                 $("#fcn").text("");
             }
@@ -187,6 +190,7 @@ function show_barcode(data) {
 
     // Append the SVG element to the container
     container.node().append(svg.node());
+    // container.html(svg.node().outerHTML);
 }
 
 function show_fcn(adjacencyMatrix, barcodes) {
@@ -264,9 +268,46 @@ function show_fcn(adjacencyMatrix, barcodes) {
     container.node().append(svg.node());
 }
 
-get_data().then(function (matrix) {
-    const barcodes = get_0_dim_barcodes(matrix);
-    show_barcode(barcodes);
-    show_fcn(matrix, barcodes);
-});
+async function read_file(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
 
+        reader.onload = function (e) {
+            const content = e.target.result;
+            let matrix;
+            if (file.name.endsWith(".csv")) {
+                matrix = d3.csvParseRows(content, (row) => row.map((value) => +value));
+            } else if (file.name.endsWith(".tsv") || file.name.endsWith(".txt")) {
+                matrix = d3.tsvParseRows(content, (row) => row.map((value) => +value));
+            } else {
+                reject(new Error("Unsupported file format"));
+            }
+            resolve(matrix);
+        };
+
+        reader.readAsText(file);
+    });
+}
+
+$("#data_file").on("change", function (event) {
+        $("#output").show();
+
+        const file = event.target.files[0];
+
+        if (file) {
+            $("#barcodes").empty();
+            $("#fcn").empty();
+            read_file(file).then(function (matrix) {
+                const barcodes = get_0_dim_barcodes(matrix);
+                show_barcode(barcodes);
+                // show_fcn(matrix, barcodes);
+            }).catch(function (error) {
+                console.error(error.message);
+            });
+        }
+    }
+)
+
+$(document).ready(function () {
+    $("#output").hide();
+});
