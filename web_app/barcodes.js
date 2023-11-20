@@ -157,7 +157,7 @@ function get_0_dim_barcodes(matrix) {
 //     return barcodes;
 // }
 
-function show_barcode(data) {
+function show_barcode(barcodes, matrix) {
     // Select the container with id "barcodes"
     const container = d3.select("#barcodes");
 
@@ -174,12 +174,12 @@ function show_barcode(data) {
     const bar_click_color = "#FFBF3F";
 
     // Calculate the height of the SVG container based on the number of bars
-    const height = data.length * (bar_height + 5) + margin_top + margin_bottom;
+    const height = barcodes.length * (bar_height + 5) + margin_top + margin_bottom;
     const padding = 5;
     // Sort data by the second element of each sub-array (largest to smallest)
-    data.sort((a, b) => b[1] - a[1]);
+    barcodes.sort((a, b) => b[1] - a[1]);
     // Calculate the maximum value in the data array
-    const maxValue = d3.max(data, d => d[1]);
+    const maxValue = d3.max(barcodes, d => d[1]);
 
     // Create scales for x and y axes
     const xScale = d3.scaleLinear()
@@ -187,7 +187,7 @@ function show_barcode(data) {
         .range([margin_left, width]);
 
     const yScale = d3.scaleBand()
-        .domain(d3.range(data.length))
+        .domain(d3.range(barcodes.length))
         .range([margin_top + padding, height - margin_bottom])
         .padding(0.1);
 
@@ -198,7 +198,7 @@ function show_barcode(data) {
 
     // Create horizontal bars
     svg.selectAll("rect")
-        .data(data)
+        .data(barcodes)
         .enter().append("rect")
         .attr("x", margin_left)
         .attr("y", (d, i) => yScale(i))
@@ -236,7 +236,6 @@ function show_barcode(data) {
             }, 100);
         })
         .on("click", function (event, d) {
-            // d3.select(this).attr("fill", bar_click_color);
             const current_element = d3.select(this);
             if (current_element.attr("clicked") === "false") {
                 $(".bar").attr("fill", bar_color);
@@ -246,16 +245,13 @@ function show_barcode(data) {
                 const bar_end = d3.format(".3f")(d[1]);
                 const msg = `[${d[0]}, ${bar_end}), ${d[2].length} components`;
                 $("#fcn_graph").empty();
-                $("#fcn").empty();
                 $("#fcn").text(msg);
-                console.log("d", d);
-                show_fcn(data, bar_end, d);
+                show_fcn(matrix, bar_end, d);
             } else {
                 current_element.attr("fill", bar_color);
                 current_element.attr("clicked", "false");
                 $("#fcn").empty();
                 $("#fcn_graph").empty();
-                // $("#fcn").text("");
             }
         });
 
@@ -286,119 +282,66 @@ function show_fcn(matrix, max_distance, select_bar) {
     // Create the SVG container.
     const svg = d3.create("svg")
         .attr("width", width)
-        .attr("height", height);
+        .attr("height", height)
+        .attr("viewBox", [-width / 2, -height / 2, width, height])
+        .attr("style", "max-width: 100%; height: auto;");
 
-    var nodes = [];
+    let nodes = [];
     for (let i = 0; i < matrix.length; i++) {
-        nodes.push({id: i, name: i});
+        nodes.push({id: i, name: i.toString()});
     }
 
-    var links = [];
-    for (var i = 0; i < matrix.length; i++) {
-        for (var j = i + 1; j < matrix[i].length; j++) {
+    let links = [];
+    for (let i = 0; i < matrix.length; i++) {
+        for (let j = i + 1; j < matrix[i].length; j++) {
             if ((matrix[i][j] !== 0) && (matrix[i][j] <= max_distance)) {
-                links.push({source: i, target: j, weight: matrix[i][j]});
+                links.push({source: i, target: j, value: matrix[i][j]});
             }
         }
     }
-    // const components = select_bar[2];
-    // console.log("components", components);
-    // if (components.length > 1) {
-    //     for (let i = 0; i < components.length; i++) {
-    //         const component = components[i];
-    //         if (component.length > 1) {
-    //             for (let j = 1; j < component.length; j++) {
-    //                 links.push({source: component[j], target: component[j - 1], weight: matrix[i][j]});
-    //             }
-    //         }
-    //     }
-    // }
+
+    // Create a simulation with several forces.
+    const simulation = d3.forceSimulation(nodes)
+        .force("link", d3.forceLink(links).id(d => d.id))
+        .force("charge", d3.forceManyBody())
+        .force("x", d3.forceX())
+        .force("y", d3.forceY());
 
 
-    console.log(max_distance, nodes, links);
-
-    // Initialize the links
-    var link = svg
+    // Add a line for each link, and a circle for each node.
+    const link = svg.append("g")
+        .attr("stroke", "#999")
+        .attr("stroke-opacity", 0.6)
         .selectAll("line")
         .data(links)
-        .enter()
-        .append("line")
-        .style("stroke", bar_hover_color)
+        .join("line")
+        .attr("stroke-width", d => Math.sqrt(d.value));
 
-    // Initialize the nodes
-    var node = svg
+    const node = svg.append("g")
+        .attr("stroke", "#fff")
+        .attr("stroke-width", 1.5)
         .selectAll("circle")
         .data(nodes)
-        .enter()
-        .append("circle")
-        .attr("r", 20)
-        .style("fill", bar_color)
+        .join("circle")
+        .attr("r", 5)
+        .attr("fill", "red");
 
-
-    node.append("text")
-        .attr("x", 8)
-        .attr("y", "0.31em")
-        .text(d => d.id)
-        .clone(true).lower()
-        .attr("fill", "none")
-        .attr("stroke", "white")
-        .attr("stroke-width", 3);
-
-    var simulation = d3.forceSimulation(nodes)
-        .force("link", d3.forceLink()
-            .id(function (d) {
-                return d.id;
-            })
-            .links(links)
-        )
-        .force("charge", d3.forceManyBody().strength(-400))
-        .force("center", d3.forceCenter(width / 2, height / 2))
-        .force("collide", d3.forceCollide().radius(20))  // Prevent node overlap
-        .alphaDecay(0.02)  // Adjust alpha decay to control the simulation duration
-        .on("end", ticked);
-
-
-    // // Create a simulation with several forces.
-    // const simulation = d3.forceSimulation(nodes)
-    //     .force("link", d3.forceLink(links).id(d => d.id))
-    //     .force("charge", d3.forceManyBody())
-    //     .force("x", d3.forceX())
-    //     .force("y", d3.forceY());
-
-    // This function is run at each iteration of the force algorithm, updating the nodes position.
-    function ticked() {
+    node.append("title")
+        .text(d => d.id);
+    // Set the position attributes of links and nodes each time the simulation ticks.
+    simulation.on("tick", () => {
         link
-            .attr("x1", function (d) {
-                return d.source.x;
-            })
-            .attr("y1", function (d) {
-                return d.source.y;
-            })
-            .attr("x2", function (d) {
-                return d.target.x;
-            })
-            .attr("y2", function (d) {
-                return d.target.y;
-            });
+            .attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y);
 
         node
-            .attr("cx", function (d) {
-                return d.x + 6;
-            })
-            .attr("cy", function (d) {
-                return d.y - 6;
-            });
-    }
+            .attr("cx", d => d.x)
+            .attr("cy", d => d.y);
+    });
 
-
-    // Create links
-    // var linkSelection = svg.selectAll("line")
-    //     .data(links)
-    //     .enter()
-    //     .append("line")
-    //     .style("stroke", "black");
-    //
-    // // Create nodes
+    // Create nodes
     // var nodeSelection = svg.selectAll("circle")
     //     .data(d3.range(adjacencyMatrix.length))
     //     .enter()
@@ -469,9 +412,8 @@ function default_show() {
         $("#barcodes").empty();
         get_static_data(file).then(function (matrix) {
             const barcodes = get_0_dim_barcodes(matrix);
-            show_barcode(barcodes);
+            show_barcode(barcodes, matrix);
             $("#fcn_graph").empty();
-            console.log("barcodes", barcodes);
             show_fcn(matrix, 0, barcodes[0]);
         }).catch(function (error) {
             console.error(error.message);
@@ -486,9 +428,9 @@ $("#data_file").on("change", function (event) {
             $("#barcodes").empty();
             read_file(file).then(function (matrix) {
                 const barcodes = get_0_dim_barcodes(matrix);
-                show_barcode(barcodes);
+                show_barcode(barcodes, matrix);
                 $("#fcn_graph").empty();
-                show_fcn(matrix, barcodes, 0);
+                show_fcn(matrix, 0, barcodes[0]);
             }).catch(function (error) {
                 console.error(error.message);
             });
