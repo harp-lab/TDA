@@ -243,7 +243,7 @@ function show_barcode(barcodes, matrix) {
                 current_element.attr("fill", bar_click_color);
                 current_element.attr("clicked", "true");
                 const bar_end = d3.format(".3f")(d[1]);
-                const msg = `[${d[0]}, ${bar_end}), ${d[2].length} components`;
+                const msg = `Selected barcode: [${d[0]}, ${bar_end}), ${d[2].length} components`;
                 $("#fcn_graph").empty();
                 $("#fcn").text(msg);
                 show_fcn(matrix, bar_end, d);
@@ -252,6 +252,7 @@ function show_barcode(barcodes, matrix) {
                 current_element.attr("clicked", "false");
                 $("#fcn").empty();
                 $("#fcn_graph").empty();
+                default_show();
             }
         });
 
@@ -274,7 +275,7 @@ function show_fcn(matrix, max_distance, select_bar) {
     const bar_click_color = "#FFBF3F";
     // Declare the chart dimensions and margins.
     const width = container.node().getBoundingClientRect().width;
-    const height = 500;
+    const height = 700;
     const margin_top = 20;
     const margin_right = 20;
     const margin_bottom = 20;
@@ -303,19 +304,19 @@ function show_fcn(matrix, max_distance, select_bar) {
     // Create a simulation with several forces.
     const simulation = d3.forceSimulation(nodes)
         .force("link", d3.forceLink(links).id(d => d.id))
-        .force("charge", d3.forceManyBody())
-        .force("x", d3.forceX())
-        .force("y", d3.forceY());
+        .force("charge", d3.forceManyBody().strength(-225)) // Adjust charge strength
+        .force("x", d3.forceX().strength(0.2)) // Adjust forceX strength
+        .force("y", d3.forceY().strength(0.2)); // Adjust forceY strength
 
 
     // Add a line for each link, and a circle for each node.
     const link = svg.append("g")
-        .attr("stroke", "#999")
+        .attr("stroke", bar_hover_color)
         .attr("stroke-opacity", 0.6)
         .selectAll("line")
         .data(links)
         .join("line")
-        .attr("stroke-width", d => Math.sqrt(d.value));
+        .attr("stroke-width", 3);
 
     const node = svg.append("g")
         .attr("stroke", "#fff")
@@ -323,11 +324,31 @@ function show_fcn(matrix, max_distance, select_bar) {
         .selectAll("circle")
         .data(nodes)
         .join("circle")
-        .attr("r", 5)
-        .attr("fill", "red");
+        .attr("r", 7)
+        .attr("fill", bar_color)
+        .on("mouseover", function (event, d) {
+            const current_element = d3.select(this);
+            const msg = `node ${d.id}`;
+            current_element.style("cursor", "pointer");
+            $(this).tooltip({
+                title: msg,
+                placement: "top",
+                trigger: "manual"
+            }).tooltip("show");
+        })
+        .on("mouseout", function (d) {
+            const current_element = d3.select(this);
+            current_element.style("cursor", "auto");
+            // Use Bootstrap's tooltip hide with a delay
+            const tooltip_element = $(this);
+            setTimeout(function () {
+                tooltip_element.tooltip("hide");
+            }, 100);
+        })
 
-    node.append("title")
-        .text(d => d.id);
+
+    // node.append("title")
+    //     .text(d => d.id);
     // Set the position attributes of links and nodes each time the simulation ticks.
     simulation.on("tick", () => {
         link
@@ -340,48 +361,8 @@ function show_fcn(matrix, max_distance, select_bar) {
             .attr("cx", d => d.x)
             .attr("cy", d => d.y);
     });
-
-    // Create nodes
-    // var nodeSelection = svg.selectAll("circle")
-    //     .data(d3.range(adjacencyMatrix.length))
-    //     .enter()
-    //     .append("circle")
-    //     .attr("r", 5)
-    //     .attr("cx", function (d, i) {
-    //         return Math.cos(2 * Math.PI * i / adjacencyMatrix.length) * 150 + 200;
-    //     })
-    //     .attr("cy", function (d, i) {
-    //         return Math.sin(2 * Math.PI * i / adjacencyMatrix.length) * 150 + 200;
-    //     })
-    //     .style("fill", "blue")
-    //     .style("cursor", "pointer")
-    //     .on("mouseover", function (event, d) {
-    //         // Add tooltip or any other action on mouseover
-    //         d3.select(this).style("fill", "red");
-    //     })
-    //     .on("mouseout", function (event, d) {
-    //         // Reset to original color on mouseout
-    //         d3.select(this).style("fill", "blue");
-    //     });
-
-    // Create labels for weights
-    // var textSelection = svg.selectAll("text")
-    //     .data(links)
-    //     .enter()
-    //     .append("text")
-    //     .attr("x", function (d) {
-    //         return (nodeSelection.data()[d.source].cx + nodeSelection.data()[d.target].cx) / 2;
-    //     })
-    //     .attr("y", function (d) {
-    //         return (nodeSelection.data()[d.source].cy + nodeSelection.data()[d.target].cy) / 2;
-    //     })
-    //     .text(function (d) {
-    //         return d.weight;
-    //     })
-    //     .attr("text-anchor", "middle")
-    //     .attr("dominant-baseline", "middle");
-
     container.node().append(svg.node());
+
 }
 
 async function read_file(file) {
@@ -407,7 +388,8 @@ async function read_file(file) {
 
 function default_show() {
     $("#output").show();
-    const file = "../data/demo_data.txt";
+    // const file = "../data/demo_data.txt";
+    let file = "../data/fmri_data/normalize_dfc_2500_subject_1_time_1.txt";
     if (file) {
         $("#barcodes").empty();
         get_static_data(file).then(function (matrix) {
