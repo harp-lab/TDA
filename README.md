@@ -103,7 +103,7 @@ python main.py --data {DATASET_NAME}.csv
 Example:
 
 ```commandline
-python main.py --data time_varying_4_4.csv
+python main.py --data ../data/time_varying_4_4.csv
 ```
 
 - To generate barcode including adjacency matrix for a specific dataset:
@@ -115,7 +115,7 @@ python main.py --data {DATASET_NAME}.csv --matrix
 Example:
 
 ```commandline
-python main.py --data time_varying_4_4.csv --matrix
+python main.py --data ../data/time_varying_4_4.csv --matrix
 ```
 
 ![alt time_varying_4_4 output](screenshots/time_varying_4_4.png)
