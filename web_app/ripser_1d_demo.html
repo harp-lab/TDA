@@ -1,12 +1,21 @@
 <html>
 <head>
-    <script src="ripser.js"></script>
+    <style>
+        .hidden {
+            visibility: hidden;
+        }
+    </style>
 </head>
 <body>
+<div id="diagram" class="hidden"></div>
 <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
         integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"
+        integrity="sha512-M7nHCiNUOwFt6Us3r8alutZLm9qMt4s9951uo8jqO4UwJ1hziseL6O3ndFyigx6+LREfZqnhHxYjKRJ8ZQ69DQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="ripser_npm.js"></script>
+
 <script>
-    // Example adjacency matrix (replace this with your own data)
     const adjacencyMatrix = [
         [0, 2.83, 6.08, 6.08, 3.6],
         [2.83, 0, 4.12, 5, 4.12],
@@ -15,38 +24,29 @@
         [3.6, 4.12, 4.24, 3.16, 0]
     ];
 
-    // Convert adjacency matrix to edge list
-    const edgeList = [];
-    const numNodes = adjacencyMatrix.length;
-
-    for (let i = 0; i < numNodes; i++) {
-        for (let j = i + 1; j < numNodes; j++) {
-            if (adjacencyMatrix[i][j] === 1) {
-                edgeList.push([i, j]);
+    function after_computation() {
+        let barcodes = [];
+        $('#diagram svg rect').each(function () {
+            const title = $(this).find('title');
+            if (title.length > 0) {
+                const values = title.text().replace(/[\[\],)]/g, '').replace(/[\s]/g, '-').split('-');
+                barcodes.push([parseFloat(values[0]), parseFloat(values[1])]);
             }
-        }
+        });
+        console.log(barcodes);
     }
 
-    // Convert edge list to point cloud data
-    const pointCloud = edgeList.map(edge => [(edge[0] + edge[1]) / 2.0]);
-
     // Ripser options
-    const options = {
-        format: 'pointcloud', // Input data format ('distance' or 'pointcloud')
-        threshold: 1.0,        // Maximum distance to consider (useful for sparse datasets)
+    const ripser_options = {
+        // outputType: 'PersistenceDiagram',
+        format: "distance",
+        minDim: 1,
+        maxDim: 1,
+        callback: after_computation
     };
 
     $(document).ready(function () {
-        // Call Ripser to compute 1-dimensional persistence
-        window.ripser.computeRipser({points: pointCloud}, options)
-            .then(result => {
-                // Result contains the persistence diagram for dimension 1
-                const persistenceDiagram = result['dgms'][1];
-                console.log('1-D Persistence Diagram:', persistenceDiagram);
-            })
-            .catch(error => {
-                console.error('Error computing persistence:', error);
-            });
+        Ripser.run(adjacencyMatrix, "#diagram", ripser_options);
     })
 
 </script>

@@ -1,10 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"
-            integrity="sha512-M7nHCiNUOwFt6Us3r8alutZLm9qMt4s9951uo8jqO4UwJ1hziseL6O3ndFyigx6+LREfZqnhHxYjKRJ8ZQ69DQ=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport"
@@ -17,7 +13,7 @@
     <link rel="canonical"
           href="/"/>
 
-    <title>0 dim barcodes visualization</title>
+    <title>Persistent Barcodes Visualization</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
@@ -39,11 +35,6 @@
                 </svg>
                 &nbsp;
                 <span class="fs-4">Barcodes</span>
-            </a>
-            <a class="me-3 py-2 text-dark text-decoration-none"
-               href="" data-bs-toggle="tooltip"
-               data-bs-placement="bottom" title="Show all panels">
-                <i class="bi bi-journals"></i> Home
             </a>
             <!--            <a class="me-3 py-2 text-dark text-decoration-none"-->
             <!--               href=""-->
@@ -78,8 +69,17 @@
         <div class="row pb-4">
             <div class="col">
                 <h2 class="pb-2 border-bottom">
-                    0 Dimensional Persistent Barcodes Visualization
+                    Persistent Barcodes Visualization
                 </h2>
+                <button class="btn btn-outline-dark active me-2 py-2 text-decoration-none"
+                        id="show_1d_barcode">
+                    <i class="bi bi-journals"></i> 1-dim barcodes
+                </button>
+                <button class="btn btn-outline-dark me-2 py-2 text-decoration-none"
+                        id="show_0d_barcode">
+                    <i class="bi bi-journals"></i> 0-dim barcodes
+                </button>
+
             </div>
         </div>
         <div class="row mb-4">
@@ -103,18 +103,29 @@
                 </div>
             </div>
         </div>
-        <div class="row" id="output">
-            <div class="col-12">
-                <h3>0 Dimensional Barcode</h3>
-                <div id="barcodes"></div>
-            </div>
-            <div class="col-12">
-                <h3>Network</h3>
-                <div id="fcn"></div>
-                <div id="fcn_graph" class="border border-2">
+        <div id="output">
+            <div class="row">
+                <div class="col-12">
+                    <h3><span id="dimension_value"></span> Dimensional Barcodes</h3>
+                    <div id="barcodes">
 
+                    </div>
                 </div>
             </div>
+            <div class="row">
+                <h3>Network</h3>
+                <p class="lead">Click on any barcode above to visualize the FCN at that range</p>
+                <div id="fcn"></div>
+                <div class="col-6 border">
+                    <h4 class="text-center p-4" id="fcn_graph_start_title">Maximum distance of bar start</h4>
+                    <div id="fcn_graph_start"></div>
+                </div>
+                <div class="col-6 border">
+                    <h4 class="text-center p-4" id="fcn_graph_end_title">Maximum distance of bar end</h4>
+                    <div id="fcn_graph_end"></div>
+                </div>
+            </div>
+
         </div>
     </main>
 </div>
@@ -159,13 +170,61 @@
         </div>
     </div>
 </footer>
+<div id="diagram" class="d-none"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"
+        integrity="sha512-M7nHCiNUOwFt6Us3r8alutZLm9qMt4s9951uo8jqO4UwJ1hziseL6O3ndFyigx6+LREfZqnhHxYjKRJ8ZQ69DQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
         crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
         integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
+<script src="web_app/ripser_npm.js"></script>
+<script src="web_app/barcodes.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#output").hide();
+        let dimension = 1;
+        $('#show_1d_barcode').on('click', function () {
+            dimension = 1;
+            default_show(dimension);
+            $("#dimension_value").text(1);
+            $(this).addClass('active');
+            $("#show_0d_barcode").removeClass("active");
+        });
 
-<script src="barcodes.js">
+        $('#show_0d_barcode').on('click', function () {
+            dimension = 0;
+            default_show(dimension);
+            $("#dimension_value").text(0);
+            $(this).addClass('active');
+            $("#show_1d_barcode").removeClass("active");
+        });
+        default_show(dimension);
+
+
+        $("#data_file").on("change", function (event) {
+                $("#output").show();
+                const file = event.target.files[0];
+                if (file) {
+                    read_file(file).then(function (matrix) {
+                        const ripser_options = {
+                            // outputType: 'PersistenceDiagram',
+                            format: "distance",
+                            minDim: dimension,
+                            maxDim: dimension,
+                            callback: after_computation.bind(null, matrix)
+                        };
+                        Ripser.run(matrix, "#diagram", ripser_options);
+
+                    }).catch(function (error) {
+                        console.error(error.message);
+                    });
+                }
+            }
+        )
+    });
+
 </script>
 
 </body>

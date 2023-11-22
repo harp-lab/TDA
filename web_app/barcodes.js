@@ -1,74 +1,3 @@
-function get_unique_distances(matrix) {
-    const unique_distances = new Set();
-    for (let i = 0; i < matrix.length; i++) {
-        for (let j = i + 1; j < matrix.length; j++) {
-            unique_distances.add(matrix[i][j]);
-        }
-    }
-    const distances = Array.from(unique_distances);
-    distances.sort();
-    return distances;
-}
-
-function get_components(matrix, min_distance) {
-    const components = [];
-    const number_of_nodes = matrix.length;
-    const seen = new Set();
-    for (let i = 0; i < number_of_nodes; i++) {
-        if (!seen.has(i)) {
-            let component = [];
-            let visited = new Array(number_of_nodes).fill(false);
-            let queue = [i];
-            visited[i] = true;
-            while (queue.length !== 0) {
-                const current_node = queue.shift();
-                seen.add(current_node);
-                component.push(current_node);
-                for (let node = 0; node < number_of_nodes; node++) {
-                    if (visited[node] === false && (matrix[current_node][node] <= min_distance)) {
-                        queue.push(node);
-                        visited[node] = true;
-                    }
-                }
-            }
-            components.push(component);
-        }
-    }
-    return components;
-}
-
-// function get_holes(matrix, min_distance) {
-//     const holes = [];
-//     const number_of_nodes = matrix.length;
-//     const seen = new Set();
-//
-//     function dfs(node, parent, hole) {
-//         seen.add(node);
-//         hole.push(node);
-//
-//         for (let neighbor = 0; neighbor < number_of_nodes; neighbor++) {
-//             if (matrix[node][neighbor] <= min_distance) {
-//                 if (!seen.has(neighbor)) {
-//                     dfs(neighbor, node, hole);
-//                 } else if (neighbor !== parent && hole.indexOf(neighbor) !== -1) {
-//                     // Found a hole (cycle)
-//                     holes.push(hole.slice(hole.indexOf(neighbor)));
-//                 }
-//             }
-//         }
-//     }
-//
-//     for (let i = 0; i < number_of_nodes; i++) {
-//         if (!seen.has(i)) {
-//             const hole = [];
-//             dfs(i, -1, hole);
-//         }
-//     }
-//
-//     return holes;
-// }
-
-
 async function get_static_data(file_path) {
     let data_file = "../data/fmri_data/normalize_dfc_2500_subject_1_time_1.txt";
     // data_file = "../data/demo_data.txt";
@@ -87,80 +16,13 @@ async function get_static_data(file_path) {
     });
 }
 
-function get_0_dim_barcodes(matrix) {
-    const number_of_nodes = matrix.length;
-    let barcodes = [];
-    const unique_distances = get_unique_distances(matrix);
-    const max_distance = unique_distances[unique_distances.length - 1];
-    let prev_number_of_components = -1;
-    for (let i = 0; i < unique_distances.length; i++) {
-        const distance = unique_distances[i];
-        const components = get_components(matrix, distance);
-        const number_of_components = components.length;
-        if (number_of_components === 1) {
-            barcodes.push([0, distance, components]);
-            break;
-        }
-        if (prev_number_of_components === -1) {
-            prev_number_of_components = number_of_components;
-            barcodes.push([0, distance, components]);
-            continue;
-        }
-        if (number_of_components < prev_number_of_components) {
-            for (let i = 0; i < (prev_number_of_components - number_of_components); i++) {
-                barcodes.push([0, distance, components]);
-            }
-            prev_number_of_components = number_of_components;
-        }
-    }
-    const remaining_bars = number_of_nodes - barcodes.length;
-    const components = get_components(matrix, max_distance);
-    for (let i = 0; i < remaining_bars; i++) {
-        barcodes.push([0, max_distance, components]);
-    }
-    return barcodes;
-}
-
-// function get_1_dim_barcodes(matrix) {
-//     const number_of_nodes = matrix.length;
-//     let barcodes = [];
-//     const unique_distances = get_unique_distances(matrix);
-//     const max_distance = unique_distances[unique_distances.length - 1];
-//     let prev_number_of_components = -1;
-//     for (let i = 0; i < unique_distances.length; i++) {
-//         const distance = unique_distances[i];
-//         // const components = get_components(matrix, distance);
-//         const holes = get_holes(matrix, distance);
-//         console.log(distance, holes);
-//         // const number_of_components = components.length;
-//         // if (number_of_components === 1) {
-//         //     barcodes.push([0, distance, components]);
-//         //     break;
-//         // }
-//         // if (prev_number_of_components === -1) {
-//         //     prev_number_of_components = number_of_components;
-//         //     barcodes.push([0, distance, components]);
-//         //     continue;
-//         // }
-//         // if (number_of_components < prev_number_of_components) {
-//         //     for (let i = 0; i < (prev_number_of_components - number_of_components); i++) {
-//         //         barcodes.push([0, distance, components]);
-//         //     }
-//         //     prev_number_of_components = number_of_components;
-//         // }
-//     }
-//     // const remaining_bars = number_of_nodes - barcodes.length;
-//     // const components = get_components(matrix, max_distance);
-//     // for (let i = 0; i < remaining_bars; i++) {
-//     //     barcodes.push([0, max_distance, components]);
-//     // }
-//     return barcodes;
-// }
 
 function show_barcode(barcodes, matrix) {
+    $("#barcodes").empty();
     // Select the container with id "barcodes"
     const container = d3.select("#barcodes");
-
+    // Remove existing SVG content
+    container.selectAll("svg").remove();
     // Declare the chart dimensions and margins.
     const width = container.node().getBoundingClientRect().width;
     const margin_top = 20;
@@ -176,10 +38,13 @@ function show_barcode(barcodes, matrix) {
     // Calculate the height of the SVG container based on the number of bars
     const height = barcodes.length * (bar_height + 5) + margin_top + margin_bottom;
     const padding = 5;
-    // Sort data by the second element of each sub-array (largest to smallest)
-    barcodes.sort((a, b) => b[1] - a[1]);
-    // Calculate the maximum value in the data array
-    const maxValue = d3.max(barcodes, d => d[1]);
+    // Sort data by the length of the ranges (largest to smallest)
+    barcodes.sort((a, b) => (b[1] - b[0]) - (a[1] - a[0]));
+    // // Sort data by the second element of each sub-array (largest to smallest)
+    // barcodes.sort((a, b) => b[1] - a[1]);
+    // Calculate the maximum value in the matrix
+    const maxValue = matrix.reduce((max, row) => Math.max(max, ...row), Number.NEGATIVE_INFINITY);
+
 
     // Create scales for x and y axes
     const xScale = d3.scaleLinear()
@@ -200,9 +65,9 @@ function show_barcode(barcodes, matrix) {
     svg.selectAll("rect")
         .data(barcodes)
         .enter().append("rect")
-        .attr("x", margin_left)
+        .attr("x", d => xScale(d[0]))  // Use d[0] as the starting point
         .attr("y", (d, i) => yScale(i))
-        .attr("width", d => xScale(d[1]))
+        .attr("width", d => xScale(d[1] - d[0]))  // Adjust the width based on the range
         .attr("height", bar_height)
         .attr("fill", bar_color)
         .attr("clicked", "false")
@@ -212,8 +77,10 @@ function show_barcode(barcodes, matrix) {
             if (current_element.attr("clicked") === "false") {
                 current_element.attr("fill", bar_hover_color);
             }
-            const bar_end = d3.format(".3f")(d[1]);
-            const msg = `[${d[0]}, ${bar_end}), ${d[2].length} components`;
+            const bar_start = d3.format(".5f")(d[0]);
+            const bar_end = d3.format(".5f")(d[1]);
+
+            const msg = `[${bar_start}, ${bar_end})`;
             current_element.style("cursor", "pointer");
             $(this).tooltip({
                 title: msg,
@@ -242,17 +109,22 @@ function show_barcode(barcodes, matrix) {
                 $(".bar").attr("clicked", "false");
                 current_element.attr("fill", bar_click_color);
                 current_element.attr("clicked", "true");
+                const bar_start = d3.format(".3f")(d[0]);
                 const bar_end = d3.format(".3f")(d[1]);
-                const msg = `Selected barcode: [${d[0]}, ${bar_end}), ${d[2].length} components`;
-                $("#fcn_graph").empty();
+                const msg = `Selected barcode: [${d[0]}, ${bar_end})`;
+                $("#fcn_graph_start").empty();
+                $("#fcn_graph_end").empty();
                 $("#fcn").text(msg);
-                show_fcn(matrix, bar_end, d);
+                show_fcn(matrix, bar_start, "fcn_graph_start");
+                show_fcn(matrix, bar_end, "fcn_graph_end");
             } else {
                 current_element.attr("fill", bar_color);
                 current_element.attr("clicked", "false");
                 $("#fcn").empty();
-                $("#fcn_graph").empty();
-                default_show();
+                $("#fcn_graph_start").empty();
+                $("#fcn_graph_end").empty();
+                show_fcn(matrix, 0, "fcn_graph_start");
+                show_fcn(matrix, 0, "fcn_graph_end");
             }
         });
 
@@ -267,9 +139,11 @@ function show_barcode(barcodes, matrix) {
     // container.html(svg.node().outerHTML);
 }
 
-function show_fcn(matrix, max_distance, select_bar) {
+function show_fcn(matrix, max_distance, html_element_id) {
     // Select the container with id "barcodes"
-    const container = d3.select("#fcn_graph");
+    $("#" + html_element_id).empty();
+    $("#" + html_element_id+"_title").text("Maximum distance "+max_distance);
+    const container = d3.select("#" + html_element_id);
     const bar_color = "#001E62";
     const bar_hover_color = "#D50032";
     const bar_click_color = "#FFBF3F";
@@ -304,7 +178,7 @@ function show_fcn(matrix, max_distance, select_bar) {
     // Create a simulation with several forces.
     const simulation = d3.forceSimulation(nodes)
         .force("link", d3.forceLink(links).id(d => d.id))
-        .force("charge", d3.forceManyBody().strength(-225)) // Adjust charge strength
+        .force("charge", d3.forceManyBody().strength(-150)) // Adjust charge strength
         .force("x", d3.forceX().strength(0.2)) // Adjust forceX strength
         .force("y", d3.forceY().strength(0.2)); // Adjust forceY strength
 
@@ -346,9 +220,6 @@ function show_fcn(matrix, max_distance, select_bar) {
             }, 100);
         })
 
-
-    // node.append("title")
-    //     .text(d => d.id);
     // Set the position attributes of links and nodes each time the simulation ticks.
     simulation.on("tick", () => {
         link
@@ -386,41 +257,39 @@ async function read_file(file) {
     });
 }
 
-function default_show() {
+
+function after_computation(matrix) {
+    let barcodes = [];
+    $('#diagram svg rect').each(function () {
+        const title = $(this).find('title');
+        if (title.length > 0) {
+            const values = title.text().replace(/[\[\],)]/g, '').replace(/[\s]/g, '-').split('-');
+            barcodes.push([parseFloat(values[0]), parseFloat(values[1])]);
+        }
+    });
+    show_barcode(barcodes, matrix);
+    show_fcn(matrix, 0, "fcn_graph_start");
+    show_fcn(matrix, 0, "fcn_graph_end");
+}
+
+function default_show(dimension) {
     $("#output").show();
-    // const file = "../data/demo_data.txt";
-    let file = "../data/fmri_data/normalize_dfc_2500_subject_1_time_1.txt";
+    let file = "../data/demo_data.txt";
+    file = "../data/fmri_data/normalize_dfc_2500_subject_1_time_1.txt";
     if (file) {
-        $("#barcodes").empty();
         get_static_data(file).then(function (matrix) {
-            const barcodes = get_0_dim_barcodes(matrix);
-            show_barcode(barcodes, matrix);
-            $("#fcn_graph").empty();
-            show_fcn(matrix, 0, barcodes[0]);
+            const ripser_options = {
+                // outputType: 'PersistenceDiagram',
+                format: "distance",
+                minDim: dimension,
+                maxDim: dimension,
+                callback: after_computation.bind(null, matrix)
+            };
+            Ripser.run(matrix, "#diagram", ripser_options);
         }).catch(function (error) {
             console.error(error.message);
         });
     }
 }
 
-$("#data_file").on("change", function (event) {
-        $("#output").show();
-        const file = event.target.files[0];
-        if (file) {
-            $("#barcodes").empty();
-            read_file(file).then(function (matrix) {
-                const barcodes = get_0_dim_barcodes(matrix);
-                show_barcode(barcodes, matrix);
-                $("#fcn_graph").empty();
-                show_fcn(matrix, 0, barcodes[0]);
-            }).catch(function (error) {
-                console.error(error.message);
-            });
-        }
-    }
-)
 
-$(document).ready(function () {
-    $("#output").hide();
-    default_show();
-});
