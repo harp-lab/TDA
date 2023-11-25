@@ -1,5 +1,5 @@
 async function get_static_data(file_path) {
-    let data_file = "../data/fmri_data/normalize_dfc_2500_subject_1_time_1.txt";
+    let data_file = "data/fmri_data/normalize_dfc_2500_subject_1_time_1.txt";
     // data_file = "../data/demo_data.txt";
     // data_file = "../data/time_varying_4_4.csv";
     if (file_path !== "") {
@@ -20,11 +20,11 @@ async function get_static_data(file_path) {
 function show_barcode(barcodes, matrix) {
     $("#barcodes").empty();
     // Select the container with id "barcodes"
-    const container = d3.select("#barcodes");
+    const barcodes_container = d3.select("#barcodes");
     // Remove existing SVG content
-    container.selectAll("svg").remove();
+    barcodes_container.selectAll("svg").remove();
     // Declare the chart dimensions and margins.
-    const width = container.node().getBoundingClientRect().width;
+    const width = barcodes_container.node().getBoundingClientRect().width;
     const margin_top = 20;
     const margin_right = 20;
     const margin_bottom = 20;
@@ -38,6 +38,19 @@ function show_barcode(barcodes, matrix) {
     // Calculate the height of the SVG container based on the number of bars
     const height = barcodes.length * (bar_height + 5) + margin_top + margin_bottom;
     const padding = 5;
+
+    const barcodes_svg = d3.create("svg")
+        .attr("width", width)
+        .attr("height", height);
+
+    // Replace existing content with new SVG element
+    // const svg_construct = `<svg id='barcodes_svg' width='${width}' height='${height}'></svg>`
+    // barcodes_container.html(svg_construct);
+
+    // Get the newly created SVG element
+    // const barcodes_svg = d3.select("#barcodes_svg");
+
+
     // Sort data by the length of the ranges (largest to smallest)
     barcodes.sort((a, b) => (b[1] - b[0]) - (a[1] - a[0]));
     // // Sort data by the second element of each sub-array (largest to smallest)
@@ -56,13 +69,9 @@ function show_barcode(barcodes, matrix) {
         .range([margin_top + padding, height - margin_bottom])
         .padding(0.1);
 
-    // Create the SVG container.
-    const svg = d3.create("svg")
-        .attr("width", width)
-        .attr("height", height);
 
     // Create horizontal bars
-    svg.selectAll("rect")
+    barcodes_svg.selectAll("rect")
         .data(barcodes)
         .enter().append("rect")
         .attr("x", d => xScale(d[0]))  // Use d[0] as the starting point
@@ -104,52 +113,49 @@ function show_barcode(barcodes, matrix) {
         })
         .on("click", function (event, d) {
             const current_element = d3.select(this);
+            $("#fcn").empty();
+            $("#fcn_graph_start").empty();
+            $("#fcn_graph_end").empty();
             if (current_element.attr("clicked") === "false") {
                 $(".bar").attr("fill", bar_color);
                 $(".bar").attr("clicked", "false");
                 current_element.attr("fill", bar_click_color);
                 current_element.attr("clicked", "true");
-                const bar_start = d3.format(".3f")(d[0]);
-                const bar_end = d3.format(".3f")(d[1]);
-                const msg = `Selected barcode: [${d[0]}, ${bar_end})`;
-                $("#fcn_graph_start").empty();
-                $("#fcn_graph_end").empty();
+                const msg = `Selected barcode: [${d[0]}, ${d[1]})`;
                 $("#fcn").text(msg);
-                show_fcn(matrix, bar_start, "fcn_graph_start");
-                show_fcn(matrix, bar_end, "fcn_graph_end");
+                show_fcn(matrix, d[0], "fcn_graph_start");
+                show_fcn(matrix, d[1], "fcn_graph_end");
             } else {
                 current_element.attr("fill", bar_color);
                 current_element.attr("clicked", "false");
-                $("#fcn").empty();
-                $("#fcn_graph_start").empty();
-                $("#fcn_graph_end").empty();
                 show_fcn(matrix, 0, "fcn_graph_start");
                 show_fcn(matrix, 0, "fcn_graph_end");
             }
         });
 
     // Add the x-axis.
-    svg.append("g")
+    barcodes_svg.append("g")
         .attr("transform", `translate(0,${margin_top})`)
         .call(d3.axisTop(xScale));
 
 
     // Append the SVG element to the container
-    container.node().append(svg.node());
-    // container.html(svg.node().outerHTML);
+    barcodes_container.node().append(barcodes_svg.node());
 }
 
 function show_fcn(matrix, max_distance, html_element_id) {
     // Select the container with id "barcodes"
     $("#" + html_element_id).empty();
-    $("#" + html_element_id+"_title").text("Maximum distance "+max_distance);
+    const position = html_element_id.split("_").pop();
+    let fcn_title = `${position} threshold ${max_distance}`;
+    $("#" + html_element_id + "_title").text(fcn_title);
     const container = d3.select("#" + html_element_id);
     const bar_color = "#001E62";
     const bar_hover_color = "#D50032";
     const bar_click_color = "#FFBF3F";
     // Declare the chart dimensions and margins.
     const width = container.node().getBoundingClientRect().width;
-    const height = 700;
+    const height = 600;
     const margin_top = 20;
     const margin_right = 20;
     const margin_bottom = 20;
@@ -186,11 +192,11 @@ function show_fcn(matrix, max_distance, html_element_id) {
     // Add a line for each link, and a circle for each node.
     const link = svg.append("g")
         .attr("stroke", bar_hover_color)
-        .attr("stroke-opacity", 0.6)
+        .attr("stroke-opacity", 1)
         .selectAll("line")
         .data(links)
         .join("line")
-        .attr("stroke-width", 3);
+        .attr("stroke-width", 2);
 
     const node = svg.append("g")
         .attr("stroke", "#fff")
@@ -202,7 +208,7 @@ function show_fcn(matrix, max_distance, html_element_id) {
         .attr("fill", bar_color)
         .on("mouseover", function (event, d) {
             const current_element = d3.select(this);
-            const msg = `node ${d.id}`;
+            const msg = `Node ${d.id}`;
             current_element.style("cursor", "pointer");
             $(this).tooltip({
                 title: msg,
@@ -272,23 +278,32 @@ function after_computation(matrix) {
     show_fcn(matrix, 0, "fcn_graph_end");
 }
 
-function default_show(dimension) {
+function perform_data_change(matrix, dimension) {
     $("#output").show();
-    let file = "../data/demo_data.txt";
-    file = "../data/fmri_data/normalize_dfc_2500_subject_1_time_1.txt";
-    if (file) {
+    // Empty the existing diagram content which is generated by ripser
+    $("#diagram").empty();
+    $("#fcn").empty();
+    const ripser_options = {
+        format: "distance",
+        minDim: dimension,
+        maxDim: dimension,
+        callback: after_computation.bind(null, matrix)
+    };
+    Ripser.run(matrix, "#diagram", ripser_options);
+}
+
+function show_charts(dimension, file_matrix) {
+    $("#dimension_value").text(dimension);
+    let file = "data/demo_data.txt";
+    file = "data/fmri_data/normalize_dfc_2500_subject_1_time_1.txt";
+    if (file && file_matrix === null) {
         get_static_data(file).then(function (matrix) {
-            const ripser_options = {
-                // outputType: 'PersistenceDiagram',
-                format: "distance",
-                minDim: dimension,
-                maxDim: dimension,
-                callback: after_computation.bind(null, matrix)
-            };
-            Ripser.run(matrix, "#diagram", ripser_options);
+            perform_data_change(matrix, dimension);
         }).catch(function (error) {
             console.error(error.message);
         });
+    } else if (file_matrix !== null) {
+        perform_data_change(file_matrix, dimension);
     }
 }
 

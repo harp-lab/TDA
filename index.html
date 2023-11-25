@@ -19,157 +19,100 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
 </head>
 
-<body class="d-flex flex-column min-vh-100 bg-light bg-gradient">
-<div class="container p-3 bg-white">
-    <header>
-        <!--Header Starts-->
-        <div class="d-flex flex-column flex-md-row align-items-start pb-3 mb-4 border-bottom">
-            <a href=""
-               class="d-flex align-items-center text-dark text-decoration-none me-4"
-               data-bs-toggle="tooltip" data-bs-placement="bottom"
-               title="{{config.SITE_NAME_SHORT}}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-                     fill="currentColor" class="bi bi-collection"
-                     viewBox="0 0 16 16">
-                    <path d="M2.5 3.5a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-11zm2-2a.5.5 0 0 1 0-1h7a.5.5 0 0 1 0 1h-7zM0 13a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 16 13V6a1.5 1.5 0 0 0-1.5-1.5h-13A1.5 1.5 0 0 0 0 6v7zm1.5.5A.5.5 0 0 1 1 13V6a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-.5.5h-13z"/>
-                </svg>
-                &nbsp;
-                <span class="fs-4">Barcodes</span>
-            </a>
-            <!--            <a class="me-3 py-2 text-dark text-decoration-none"-->
-            <!--               href=""-->
-            <!--               data-bs-toggle="tooltip" data-bs-placement="bottom"-->
-            <!--               title="Add a new panel">-->
-            <!--                <i class="bi bi-journal-plus"></i> Add Panel-->
-            <!--            </a>-->
-            <!--            <a class="me-3 py-2 text-dark text-decoration-none"-->
-            <!--               href="" data-bs-toggle="tooltip"-->
-            <!--               data-bs-placement="bottom" title="Show my panels">-->
-            <!--                <i class="bi bi-person-workspace"></i> My Panels-->
-            <!--            </a>-->
-
-            <!--            <nav class="d-lg-flex mt-2 mt-lg-0 ms-lg-auto">-->
-            <!--                <a class="align-middle m-auto btn btn-outline-dark btn-sm me-1 text-decoration-none"-->
-            <!--                   href=""-->
-            <!--                   data-bs-toggle="tooltip" data-bs-placement="bottom"-->
-            <!--                   title="Login">-->
-            <!--                    <i class="bi bi-box-arrow-in-right"></i> Login-->
-            <!--                </a>-->
-            <!--                <a class="align-middle m-auto btn btn-outline-success btn-sm text-decoration-none"-->
-            <!--                   href=""-->
-            <!--                   data-bs-toggle="tooltip" data-bs-placement="bottom"-->
-            <!--                   title="Sign up">-->
-            <!--                    <i class="bi bi-person-add"></i> Sign Up-->
-            <!--                </a>-->
-            <!--            </nav>-->
-        </div>
-        <!--Header Ends-->
-    </header>
+<body class="d-flex flex-column min-vh-100 py-2">
+<div class="container-fluid bg-white">
     <main>
-        <div class="row pb-4">
+        <div class="row px-4">
             <div class="col">
-                <h2 class="pb-2 border-bottom">
-                    Persistent Barcodes Visualization
-                </h2>
-                <button class="btn btn-outline-dark active me-2 py-2 text-decoration-none"
-                        id="show_1d_barcode">
-                    <i class="bi bi-journals"></i> 1-dim barcodes
-                </button>
-                <button class="btn btn-outline-dark me-2 py-2 text-decoration-none"
-                        id="show_0d_barcode">
-                    <i class="bi bi-journals"></i> 0-dim barcodes
-                </button>
-
+                <h3 class="pb-2 border-bottom">
+                    <i class="bi bi-bar-chart-steps"></i> Persistent Barcodes Visualization
+                </h3>
             </div>
         </div>
-        <div class="row mb-4">
-            <div class="col">
-                <div class="card">
-                    <div class="card-header">
-                        Data Upload
+        <div class="row px-4 pt-1">
+            <div class="col-6 offset-3">
+                <div class="card border-dark">
+                    <div class="card-header text-bg-dark text-light lh-lg">
+                        Upload Functional Connectivity Network (FCN) Adjacency Matrix
+                        <div class="float-end">
+                            <button class="btn btn-sm btn-light text-decoration-none py-1 my-0"
+                                    id="show_example">
+                                <i class="bi bi-database"></i> Load Example Dataset
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
-                        <h5 class="card-title">Upload Functional Connected Network Adjacency Matrix</h5>
-                        <p class="card-text">Supports
+                        <p class="card-text py-0 my-0">Supports
                             <span class="font-monospace">.txt</span> / <span class="font-monospace">.tsv</span> file
                             with tab separated values or
                             <span class="font-monospace">.csv</span> file
                             with comma separated values
                         </p>
-                        <div class="mb-3">
-                            <input class="form-control" type="file" id="data_file">
+                        <div class="mb-0">
+                            <input class="form-control form-control-sm" type="file" id="data_file">
                         </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-sm btn-outline-dark active me-2 text-decoration-none"
+                                id="show_1d_barcode">
+                            <i class="bi bi-bar-chart-steps"></i> Visualize 1-dim barcodes
+                        </button>
+                        <button class="btn btn-sm btn-outline-dark me-2 text-decoration-none"
+                                id="show_0d_barcode">
+                            <i class="bi bi-bar-chart-steps"></i> Visualize 0-dim barcodes
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
         <div id="output">
-            <div class="row">
-                <div class="col-12">
-                    <h3><span id="dimension_value"></span> Dimensional Barcodes</h3>
-                    <div id="barcodes">
+            <div class="row px-4 pt-4">
+                <div class="col-3">
+                    <div class="card">
+                        <div class="card-header">
+                            <span id="dimension_value"></span> Dimensional Barcodes
+                        </div>
+                        <div class="card-body">
+                            <div id="barcodes">
 
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                <h3>Network</h3>
-                <p class="lead">Click on any barcode above to visualize the FCN at that range</p>
-                <div id="fcn"></div>
-                <div class="col-6 border">
-                    <h4 class="text-center p-4" id="fcn_graph_start_title">Maximum distance of bar start</h4>
-                    <div id="fcn_graph_start"></div>
-                </div>
-                <div class="col-6 border">
-                    <h4 class="text-center p-4" id="fcn_graph_end_title">Maximum distance of bar end</h4>
-                    <div id="fcn_graph_end"></div>
-                </div>
-            </div>
 
+                <div class="col-9">
+                    <div class="card">
+                        <div class="card-header">
+                            Network
+                            <span class="fw-light">
+                                    (Click on any barcode to visualize the FCN at that range)
+                            </span>
+                            <span class="float-end" id="fcn"></span>
+                        </div>
+                        <div class="card-body pt-0 mb-0">
+                            <div class="row py-0 my-0">
+                                <div class="col-6">
+                                    <div id="fcn_graph_start"></div>
+                                    <p class="lead text-center mb-0 pb-0 text-capitalize" id="fcn_graph_start_title">
+                                        Bar start threshold
+                                    </p>
+                                </div>
+                                <div class="col-6">
+                                    <div id="fcn_graph_end"></div>
+                                    <p class="lead text-center mb-0 pb-0 text-capitalize" id="fcn_graph_end_title">
+                                        Bar end threshold
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
         </div>
     </main>
 </div>
-<footer class="py-3 bg-dark mt-auto text-white border border-top border-2 border-dark">
-    <div class="container">
-        <div class="row">
-            <div class="col-12 col-lg-6">
-                <p class="mb-1">Developed by <a href="https://arshovon.com/"
-                                                class="text-white"
-                                                data-bs-toggle="tooltip"
-                                                data-bs-placement="top"
-                                                title="Developer profile">Shovon</a>
-                    <br>Barcodes &copy; 2023
-                </p>
-            </div>
-            <div class="col-12 col-lg-6 text-lg-end">
-                <a class="me-3 py-2 text-white text-decoration-none" href=""
-                   data-bs-toggle="tooltip"
-                   data-bs-placement="top" title="Read terms">
-                    <i class="bi-info-square"></i> Terms
-                </a>
-                <a class="me-3 py-2 text-white text-decoration-none" href=""
-                   data-bs-toggle="tooltip"
-                   data-bs-placement="top" title="Learn more about us">
-                    <i class="bi-people"></i> About
-                </a>
-                <a class="me-3 py-2 text-white text-decoration-none"
-                   target="_blank"
-                   href="https://github.com/harp-lab/tda"
-                   data-bs-toggle="tooltip" data-bs-placement="top"
-                   title="Open code repository">
-                    <i class="bi-github"></i> Code
-                </a>
-            </div>
-            <div class="fixed-bottom">
-                <a id="back-to-top" href="#" data-bs-toggle="tooltip"
-                   data-bs-placement="top" title="Go to top"
-                   class="btn btn-light btn-lg back-to-top float-end" role="button">
-                    <i class="bi bi-arrow-up-square-fill"></i>
-                </a>
-            </div>
-        </div>
-    </div>
-</footer>
 <div id="diagram" class="d-none"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"
         integrity="sha512-M7nHCiNUOwFt6Us3r8alutZLm9qMt4s9951uo8jqO4UwJ1hziseL6O3ndFyigx6+LREfZqnhHxYjKRJ8ZQ69DQ=="
@@ -185,38 +128,31 @@
     $(document).ready(function () {
         $("#output").hide();
         let dimension = 1;
+        let file_matrix = null;
         $('#show_1d_barcode').on('click', function () {
             dimension = 1;
-            default_show(dimension);
-            $("#dimension_value").text(1);
+            show_charts(dimension, file_matrix);
             $(this).addClass('active');
             $("#show_0d_barcode").removeClass("active");
         });
 
         $('#show_0d_barcode').on('click', function () {
             dimension = 0;
-            default_show(dimension);
-            $("#dimension_value").text(0);
+            show_charts(dimension, file_matrix);
             $(this).addClass('active');
             $("#show_1d_barcode").removeClass("active");
         });
-        default_show(dimension);
-
-
+        $("#show_example").on("click", function () {
+            file_matrix = null;
+            $("#data_file").val('');
+            show_charts(dimension, file_matrix);
+        })
         $("#data_file").on("change", function (event) {
-                $("#output").show();
                 const file = event.target.files[0];
                 if (file) {
                     read_file(file).then(function (matrix) {
-                        const ripser_options = {
-                            // outputType: 'PersistenceDiagram',
-                            format: "distance",
-                            minDim: dimension,
-                            maxDim: dimension,
-                            callback: after_computation.bind(null, matrix)
-                        };
-                        Ripser.run(matrix, "#diagram", ripser_options);
-
+                        file_matrix = matrix;
+                        show_charts(dimension, file_matrix);
                     }).catch(function (error) {
                         console.error(error.message);
                     });
