@@ -22,20 +22,20 @@
 <body class="d-flex flex-column min-vh-100 py-2">
 <div class="container-fluid bg-white">
     <main>
-        <div class="row px-4">
+        <div class="row px-4 mb-0">
             <div class="col">
-                <h3 class="pb-2 border-bottom">
+                <h4 class="pb-1 border-bottom">
                     <i class="bi bi-bar-chart-steps"></i> Persistent Barcodes Visualization
-                </h3>
+                </h4>
             </div>
         </div>
-        <div class="row px-4 pt-1">
+        <div class="row px-4 pt-0 mb-0">
             <div class="col-6 offset-3">
-                <div class="card border-dark">
-                    <div class="card-header text-bg-dark text-light lh-lg">
+                <div class="card border-0">
+                    <div class="card-header border-0 lh-lg">
                         Upload Functional Connectivity Network (FCN) Adjacency Matrix
                         <div class="float-end">
-                            <button class="btn btn-sm btn-light text-decoration-none py-1 my-0"
+                            <button class="btn btn-sm btn-outline-dark text-decoration-none py-1 my-0"
                                     id="show_example">
                                 <i class="bi bi-database"></i> Load Example Dataset
                             </button>
@@ -52,25 +52,32 @@
                             <input class="form-control form-control-sm" type="file" id="data_file">
                         </div>
                     </div>
-                    <div class="card-footer">
-                        <button class="btn btn-sm btn-outline-dark active me-2 text-decoration-none"
-                                id="show_1d_barcode">
-                            <i class="bi bi-bar-chart-steps"></i> Visualize 1-dim barcodes
-                        </button>
-                        <button class="btn btn-sm btn-outline-dark me-2 text-decoration-none"
-                                id="show_0d_barcode">
-                            <i class="bi bi-bar-chart-steps"></i> Visualize 0-dim barcodes
-                        </button>
+                    <div class="card-footer  bg-transparent border-0 text-center">
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Barcodes selection">
+                            <input type="radio" class="btn-check" name="dimension_selection" id="2-dim"
+                                   autocomplete="off" value="2"
+                                   checked>
+                            <label class="btn btn-outline-dark" for="2-dim">Visualize 2-dim barcodes</label>
+                            <input type="radio" class="btn-check" name="dimension_selection" id="1-dim"
+                                   autocomplete="off" value="1">
+                            <label class="btn btn-outline-dark" for="1-dim">Visualize 1-dim barcodes</label>
+                            <input type="radio" class="btn-check" name="dimension_selection" id="0-dim"
+                                   autocomplete="off" value="0">
+                            <label class="btn btn-outline-dark" for="0-dim">Visualize 0-dim barcodes</label>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
         <div id="output">
-            <div class="row px-4 pt-4">
-                <div class="col-3">
-                    <div class="card">
-                        <div class="card-header">
+            <div class="row px-4 pt-2">
+                <div class="col-4">
+                    <div class="card border-0">
+                        <div class="card-header bg-transparent border-0 text-center">
                             <span id="dimension_value"></span> Dimensional Barcodes
+                            <span class="d-block fw-light">
+                                    (Click on any barcode to visualize the FCN at that range)
+                            </span>
                         </div>
                         <div class="card-body">
                             <div id="barcodes">
@@ -80,26 +87,25 @@
                     </div>
                 </div>
 
-                <div class="col-9">
-                    <div class="card">
-                        <div class="card-header">
+                <div class="col-8">
+                    <div class="card border-0">
+                        <div class="card-header bg-transparent border-0 text-center">
                             Network
-                            <span class="fw-light">
-                                    (Click on any barcode to visualize the FCN at that range)
+                            <span class="d-block fw-light" id="fcn">
+                                    Barcode range
                             </span>
-                            <span class="float-end" id="fcn"></span>
                         </div>
                         <div class="card-body pt-0 mb-0">
                             <div class="row py-0 my-0">
                                 <div class="col-6">
                                     <div id="fcn_graph_start"></div>
-                                    <p class="lead text-center mb-0 pb-0 text-capitalize" id="fcn_graph_start_title">
+                                    <p class="text-center my-0 py-0 text-capitalize" id="fcn_graph_start_title">
                                         Bar start threshold
                                     </p>
                                 </div>
                                 <div class="col-6">
                                     <div id="fcn_graph_end"></div>
-                                    <p class="lead text-center mb-0 pb-0 text-capitalize" id="fcn_graph_end_title">
+                                    <p class="text-center my-0 py-0 text-capitalize" id="fcn_graph_end_title">
                                         Bar end threshold
                                     </p>
                                 </div>
@@ -127,21 +133,14 @@
 <script>
     $(document).ready(function () {
         $("#output").hide();
-        let dimension = 1;
+        let dimension = 2;
         let file_matrix = null;
-        $('#show_1d_barcode').on('click', function () {
-            dimension = 1;
+
+        $('input[name="dimension_selection"]').on('click', function () {
+            dimension = parseInt($(this).val());
             show_charts(dimension, file_matrix);
-            $(this).addClass('active');
-            $("#show_0d_barcode").removeClass("active");
         });
 
-        $('#show_0d_barcode').on('click', function () {
-            dimension = 0;
-            show_charts(dimension, file_matrix);
-            $(this).addClass('active');
-            $("#show_1d_barcode").removeClass("active");
-        });
         $("#show_example").on("click", function () {
             file_matrix = null;
             $("#data_file").val('');

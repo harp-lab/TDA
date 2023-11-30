@@ -24,11 +24,11 @@ function show_barcode(barcodes, matrix) {
     // Remove existing SVG content
     barcodes_container.selectAll("svg").remove();
     // Declare the chart dimensions and margins.
-    const width = barcodes_container.node().getBoundingClientRect().width;
     const margin_top = 20;
     const margin_right = 20;
     const margin_bottom = 20;
     const margin_left = 20;
+    const width = barcodes_container.node().getBoundingClientRect().width - margin_right / 2;
     const bar_height = 10; // Fixed height for the bars
 
     const bar_color = "#001E62";
@@ -42,19 +42,8 @@ function show_barcode(barcodes, matrix) {
     const barcodes_svg = d3.create("svg")
         .attr("width", width)
         .attr("height", height);
-
-    // Replace existing content with new SVG element
-    // const svg_construct = `<svg id='barcodes_svg' width='${width}' height='${height}'></svg>`
-    // barcodes_container.html(svg_construct);
-
-    // Get the newly created SVG element
-    // const barcodes_svg = d3.select("#barcodes_svg");
-
-
     // Sort data by the length of the ranges (largest to smallest)
     barcodes.sort((a, b) => (b[1] - b[0]) - (a[1] - a[0]));
-    // // Sort data by the second element of each sub-array (largest to smallest)
-    // barcodes.sort((a, b) => b[1] - a[1]);
     // Calculate the maximum value in the matrix
     const maxValue = matrix.reduce((max, row) => Math.max(max, ...row), Number.NEGATIVE_INFINITY);
 
@@ -62,7 +51,7 @@ function show_barcode(barcodes, matrix) {
     // Create scales for x and y axes
     const xScale = d3.scaleLinear()
         .domain([0, maxValue])
-        .range([margin_left, width]);
+        .range([0, width]);
 
     const yScale = d3.scaleBand()
         .domain(d3.range(barcodes.length))
@@ -133,14 +122,16 @@ function show_barcode(barcodes, matrix) {
             }
         });
 
+
     // Add the x-axis.
     barcodes_svg.append("g")
-        .attr("transform", `translate(0,${margin_top})`)
+        .attr("class", "x-axis") // Add a class for easy selection
+        .attr("transform", `translate(0, ${margin_top})`)
         .call(d3.axisTop(xScale));
-
 
     // Append the SVG element to the container
     barcodes_container.node().append(barcodes_svg.node());
+
 }
 
 function show_fcn(matrix, max_distance, html_element_id) {
