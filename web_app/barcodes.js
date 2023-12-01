@@ -58,7 +58,6 @@ function show_barcode(barcodes, matrix) {
         .range([margin_top + padding, height - margin_bottom])
         .padding(0.1);
 
-
     // Create horizontal bars
     barcodes_svg.selectAll("rect")
         .data(barcodes)
@@ -123,11 +122,49 @@ function show_barcode(barcodes, matrix) {
         });
 
 
-    // Add the x-axis.
+    const zoom = d3.zoom()
+        .scaleExtent([1, 50])
+        .on("zoom", zoomed);
+
+    const drag = d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended);
+
+    barcodes_svg.call(zoom)
+        .call(drag);
+
+
+    function zoomed(event) {
+        const new_xScale = event.transform.rescaleX(xScale);
+        barcodes_svg.selectAll("rect")
+            .attr("x", d => new_xScale(d[0]))
+            .attr("width", d => new_xScale(d[1]) - new_xScale(d[0]));
+
+        barcodes_svg.select(".x-axis")
+            .call(xAxis.scale(new_xScale));
+    }
+
+    function dragstarted(event) {
+        d3.select(this).raise().attr("stroke", "black");
+    }
+
+    function dragged(event, d) {
+        d3.select(this).attr("y", event.y);
+    }
+
+    function dragended(event) {
+        d3.select(this).attr("stroke", null);
+    }
+
+
+    const xAxis = d3.axisTop(xScale);
+
     barcodes_svg.append("g")
         .attr("class", "x-axis") // Add a class for easy selection
         .attr("transform", `translate(0, ${margin_top})`)
-        .call(d3.axisTop(xScale));
+        .call(xAxis);
+
 
     // Append the SVG element to the container
     barcodes_container.node().append(barcodes_svg.node());
