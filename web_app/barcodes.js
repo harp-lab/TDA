@@ -212,7 +212,7 @@ function show_fcn(matrix, max_distance, html_element_id) {
     // Create a simulation with several forces.
     const simulation = d3.forceSimulation(nodes)
         .force("link", d3.forceLink(links).id(d => d.id))
-        .force("charge", d3.forceManyBody().strength(-150)) // Adjust charge strength
+        .force("charge", d3.forceManyBody().strength(-135)) // Adjust charge strength
         .force("x", d3.forceX().strength(0.2)) // Adjust forceX strength
         .force("y", d3.forceY().strength(0.2)); // Adjust forceY strength
 
@@ -220,7 +220,7 @@ function show_fcn(matrix, max_distance, html_element_id) {
     // Add a line for each link, and a circle for each node.
     const link = svg.append("g")
         .attr("stroke", bar_hover_color)
-        .attr("stroke-opacity", 1)
+        .attr("stroke-opacity", 0.6)
         .selectAll("line")
         .data(links)
         .join("line")
