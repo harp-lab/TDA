@@ -172,7 +172,7 @@ function show_barcode(barcodes, matrix) {
 }
 
 function show_fcn(matrix, max_distance, html_element_id) {
-    // Select the container with id "barcodes"
+    const epsilon = 1e-7; // Choose an appropriate epsilon value based on your precision requirements
     $("#" + html_element_id).empty();
     const position = html_element_id.split("_").pop();
     let fcn_title = `${position} threshold ${max_distance}`;
@@ -203,7 +203,7 @@ function show_fcn(matrix, max_distance, html_element_id) {
     let links = [];
     for (let i = 0; i < matrix.length; i++) {
         for (let j = i + 1; j < matrix[i].length; j++) {
-            if ((matrix[i][j] !== 0) && (matrix[i][j] <= max_distance)) {
+            if ((matrix[i][j] !== 0) && (matrix[i][j] <= max_distance+epsilon)) {
                 links.push({source: i, target: j, value: matrix[i][j]});
             }
         }
