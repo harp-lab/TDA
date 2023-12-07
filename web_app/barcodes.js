@@ -1,3 +1,8 @@
+var bar_color = "#001E62";
+var bar_hover_color = "#D50032";
+var bar_click_color = "#FFBF3F";
+
+
 async function get_static_data(file_path) {
     let data_file = "data/fmri_data/normalize_dfc_2500_subject_1_time_1.txt";
     // data_file = "../data/demo_data.txt";
@@ -28,12 +33,8 @@ function show_barcode(barcodes, matrix) {
     const margin_right = 20;
     const margin_bottom = 20;
     const margin_left = 20;
-    const width = barcodes_container.node().getBoundingClientRect().width - margin_right / 2;
+    const width = barcodes_container.node().getBoundingClientRect().width - 30;
     const bar_height = 10; // Fixed height for the bars
-
-    const bar_color = "#001E62";
-    const bar_hover_color = "#D50032";
-    const bar_click_color = "#FFBF3F";
 
     // Calculate the height of the SVG container based on the number of bars
     const height = barcodes.length * (bar_height + 5) + margin_top + margin_bottom;
@@ -113,11 +114,13 @@ function show_barcode(barcodes, matrix) {
                 $("#fcn").text(msg);
                 show_fcn(matrix, d[0], "fcn_graph_start");
                 show_fcn(matrix, d[1], "fcn_graph_end");
+                show_slider(matrix, d[0], d[1]);
             } else {
                 current_element.attr("fill", bar_color);
                 current_element.attr("clicked", "false");
                 show_fcn(matrix, 0, "fcn_graph_start");
                 show_fcn(matrix, 0, "fcn_graph_end");
+                show_slider(matrix, d[0], d[1]);
             }
         });
 
@@ -165,22 +168,148 @@ function show_barcode(barcodes, matrix) {
         .attr("transform", `translate(0, ${margin_top})`)
         .call(xAxis);
 
-
     // Append the SVG element to the container
     barcodes_container.node().append(barcodes_svg.node());
 
 }
 
+function show_slider(matrix, start_value = 0, end_value = 0) {
+    // Flatten the matrix
+    let flattened_values = matrix.flat();
+
+    // Get unique values using Set
+    let values = [...new Set(flattened_values)].sort();
+
+    $("#slider-container").empty();
+    // Select the container with id "barcodes"
+    const slider_container = d3.select("#slider-container");
+    // Remove existing SVG content
+    slider_container.selectAll("svg").remove();
+    // Width and height
+    const w = slider_container.node().getBoundingClientRect().width - 30;
+    const h = 35;
+    const min_value = d3.min(values);
+    const max_value = d3.max(values);
+    if (start_value === 0 && end_value === 0) {
+        const msg = `Selected range: [0, 0)`;
+        $("#fcn").text(msg);
+    }
+
+    // Create SVG element
+    const slider_svg = d3.create("svg")
+        .attr("width", w)
+        .attr("height", h);
+
+    // Create scale for slider
+    const x_scale = d3.scaleLinear()
+        .domain([min_value, max_value])
+        .range([30, w - 30])
+        .clamp(true);
+    // Radius
+    const bar_width = 6;
+    const bar_height = 14;
+
+    // Get scaled radius on x axis
+    const scaled_bar = (values[1] - values[0]) / (x_scale(values[1]) - x_scale(values[0])) * bar_width;
+
+    const x_axis = d3.axisBottom(x_scale);
+
+    slider_svg.append("g")
+        .attr("transform", "translate(0," + h / 2 + ")")
+        .call(x_axis);
+
+    // Start bar
+    const start_bar = slider_svg.append("rect")
+        .attr("x", x_scale(start_value))
+        .attr("y", h / 2 - bar_height / 2)
+        .attr("width", bar_width * 2)
+        .attr("height", bar_height)
+        .attr("fill", bar_color)
+        .style("cursor", "pointer")
+        .call(d3.drag()
+            .on("drag", dragged_start_bar));
+
+    // End bar
+    const end_bar = slider_svg.append("rect")
+        .attr("x", x_scale(end_value))
+        .attr("y", h / 2 - bar_height / 2)
+        .attr("width", bar_width * 2)
+        .attr("height", bar_height)
+        .attr("fill", bar_hover_color)
+        .style("cursor", "pointer")
+        .call(d3.drag()
+            .on("drag", dragged_end_bar));
+
+
+    start_bar.attr("x", x_scale(start_value));
+
+    end_bar.attr("x", x_scale(end_value));
+
+
+    const filled_color = bar_click_color;
+    let filled_width = Math.max(0, parseFloat(end_bar.attr("x")) - parseFloat(start_bar.attr("x")) - (bar_width * 2));
+
+    // Filled area between start_bar and end_bar
+    const filled_area = slider_svg.append("rect")
+        .attr("x", parseFloat(start_bar.attr("x")) + (bar_width * 2))
+        .attr("y", (h / 2) - (bar_height / 4))
+        .attr("width", filled_width)
+        .attr("height", bar_height / 2)
+        .attr("fill", filled_color);
+
+    // Get x value from circle's cx
+    function get_x_value(bar) {
+        return x_scale.invert(bar.attr("x"));
+    }
+
+    // Drag functions
+    function dragged_start_bar(event) {
+        // Get proposed new value
+        var current_value = x_scale.invert(event.x);
+        // Limit based on end circle value
+        var end_bar_value = get_x_value(end_bar);
+        current_value = Math.min(current_value, end_bar_value - scaled_bar * 2);
+        // Update start circle
+        start_bar.attr("x", x_scale(current_value));
+        show_fcn(matrix, current_value, "fcn_graph_start");
+        const msg = `Selected range: [${current_value}, ${end_bar_value})`;
+        $("#fcn").text(msg);
+        // Update filled area
+        filled_area.attr("x", parseFloat(start_bar.attr("x")) + bar_width * 2)
+            .attr("width", parseFloat(end_bar.attr("x")) - parseFloat(start_bar.attr("x")) - (bar_width * 2));
+
+    }
+
+    function dragged_end_bar(event) {
+
+        // Get proposed new value
+        var current_value = x_scale.invert(event.x);
+        // Limit based on start circle value
+        var start_bar_value = get_x_value(start_bar);
+        current_value = Math.max(current_value, start_bar_value + scaled_bar * 2);
+        // Update end circle
+        end_bar.attr("x", x_scale(current_value));
+        show_fcn(matrix, current_value, "fcn_graph_end");
+        const msg = `Selected range: [${start_bar_value}, ${current_value})`;
+        $("#fcn").text(msg);
+        // Update filled area
+        filled_area.attr("x", parseFloat(start_bar.attr("x")) + bar_width * 2)
+            .attr("width", parseFloat(end_bar.attr("x")) - parseFloat(start_bar.attr("x")) - (bar_width * 2));
+
+    }
+
+    // Append the SVG element to the container
+    slider_container.node().append(slider_svg.node());
+}
+
 function show_fcn(matrix, max_distance, html_element_id) {
-    const epsilon = 1e-7; // Choose an appropriate epsilon value based on your precision requirements
+    const epsilon = 1e-5;
     $("#" + html_element_id).empty();
     const position = html_element_id.split("_").pop();
     let fcn_title = `${position} threshold ${max_distance}`;
+    max_distance += epsilon;
     $("#" + html_element_id + "_title").text(fcn_title);
     const container = d3.select("#" + html_element_id);
-    const bar_color = "#001E62";
-    const bar_hover_color = "#D50032";
-    const bar_click_color = "#FFBF3F";
     // Declare the chart dimensions and margins.
     const width = container.node().getBoundingClientRect().width;
     const height = 600;
@@ -203,7 +332,7 @@ function show_fcn(matrix, max_distance, html_element_id) {
     let links = [];
     for (let i = 0; i < matrix.length; i++) {
         for (let j = i + 1; j < matrix[i].length; j++) {
-            if ((matrix[i][j] !== 0) && (matrix[i][j] <= max_distance+epsilon)) {
+            if ((matrix[i][j] !== 0) && (matrix[i][j] <= max_distance)) {
                 links.push({source: i, target: j, value: matrix[i][j]});
             }
         }
@@ -227,17 +356,12 @@ function show_fcn(matrix, max_distance, html_element_id) {
         .attr("stroke-width", 2);
 
     const node = svg.append("g")
-        .attr("stroke", "#fff")
-        .attr("stroke-width", 1.5)
-        .selectAll("circle")
+        .selectAll("g")
         .data(nodes)
-        .join("circle")
-        .attr("r", 7)
-        .attr("fill", bar_color)
+        .join("g")
         .on("mouseover", function (event, d) {
             const current_element = d3.select(this);
             const msg = `Node ${d.id}`;
-            current_element.style("cursor", "pointer");
             $(this).tooltip({
                 title: msg,
                 placement: "top",
@@ -246,13 +370,29 @@ function show_fcn(matrix, max_distance, html_element_id) {
         })
         .on("mouseout", function (d) {
             const current_element = d3.select(this);
-            current_element.style("cursor", "auto");
-            // Use Bootstrap's tooltip hide with a delay
             const tooltip_element = $(this);
             setTimeout(function () {
                 tooltip_element.tooltip("hide");
             }, 100);
-        })
+        });
+
+    node.append("circle")
+        .attr("r", 12)
+        .attr("fill", bar_color)
+        .style("stroke-width", 1);
+
+
+    node.append("text")
+        .style("text-anchor", "middle")
+        .attr("y", 3)
+        .style("stroke", "white")
+        .style("font-size", "10px")
+        .style("stroke-width", 1)
+        .style("pointer-events", "none")
+        .text(function (d) {
+            return d.id
+        });
+
 
     // Set the position attributes of links and nodes each time the simulation ticks.
     simulation.on("tick", () => {
@@ -261,10 +401,8 @@ function show_fcn(matrix, max_distance, html_element_id) {
             .attr("y1", d => d.source.y)
             .attr("x2", d => d.target.x)
             .attr("y2", d => d.target.y);
-
         node
-            .attr("cx", d => d.x)
-            .attr("cy", d => d.y);
+            .attr("transform", d => `translate(${d.x}, ${d.y})`);
     });
     container.node().append(svg.node());
 
@@ -311,6 +449,9 @@ function perform_data_change(matrix, dimension) {
     // Empty the existing diagram content which is generated by ripser
     $("#diagram").empty();
     $("#fcn").empty();
+
+    show_slider(matrix);
+
     const ripser_options = {
         format: "distance",
         minDim: dimension,
