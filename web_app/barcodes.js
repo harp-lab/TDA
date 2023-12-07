@@ -1,3 +1,8 @@
+var bar_color = "#001E62";
+var bar_hover_color = "#D50032";
+var bar_click_color = "#FFBF3F";
+
+
 async function get_static_data(file_path) {
     let data_file = "data/fmri_data/normalize_dfc_2500_subject_1_time_1.txt";
     // data_file = "../data/demo_data.txt";
@@ -30,10 +35,6 @@ function show_barcode(barcodes, matrix) {
     const margin_left = 20;
     const width = barcodes_container.node().getBoundingClientRect().width - 30;
     const bar_height = 10; // Fixed height for the bars
-
-    const bar_color = "#001E62";
-    const bar_hover_color = "#D50032";
-    const bar_click_color = "#FFBF3F";
 
     // Calculate the height of the SVG container based on the number of bars
     const height = barcodes.length * (bar_height + 5) + margin_top + margin_bottom;
@@ -172,13 +173,12 @@ function show_barcode(barcodes, matrix) {
 
 }
 
-function show_slider(matrix, startValue = 0, endValue = 0) {
+function show_slider(matrix, start_value = 0, end_value = 0) {
     // Flatten the matrix
-    let flattenedValues = matrix.flat();
+    let flattened_values = matrix.flat();
 
-// Get unique values using Set
-    let uniqueValues = [...new Set(flattenedValues)];
-    let values = uniqueValues.sort();
+    // Get unique values using Set
+    let values = [...new Set(flattened_values)].sort();
 
     $("#slider-container").empty();
     // Select the container with id "barcodes"
@@ -187,10 +187,10 @@ function show_slider(matrix, startValue = 0, endValue = 0) {
     slider_container.selectAll("svg").remove();
     // Width and height
     const w = slider_container.node().getBoundingClientRect().width - 30;
-    var h = 35;
-    var min = d3.min(values);
-    var max = d3.max(values);
-    if (startValue === 0 && endValue === 0) {
+    const h = 35;
+    const min_value = d3.min(values);
+    const max_value = d3.max(values);
+    if (start_value === 0 && end_value === 0) {
         const msg = `Selected range: [0, 0)`;
         $("#fcn").text(msg);
     }
@@ -201,71 +201,101 @@ function show_slider(matrix, startValue = 0, endValue = 0) {
         .attr("height", h);
 
     // Create scale for slider
-    var x = d3.scaleLinear()
-        .domain([min, max])
+    const x_scale = d3.scaleLinear()
+        .domain([min_value, max_value])
         .range([30, w - 30])
         .clamp(true);
     // Radius
-    var r = 8;
+    const bar_width = 6;
+    const bar_height = 14;
 
     // Get scaled radius on x axis
-    var scaledRadius = (values[1] - values[0]) / (x(values[1]) - x(values[0])) * r;
+    const scaled_bar = (values[1] - values[0]) / (x_scale(values[1]) - x_scale(values[0])) * bar_width;
 
-    var xAxis = d3.axisBottom(x);
+    const x_axis = d3.axisBottom(x_scale);
 
     slider_svg.append("g")
         .attr("transform", "translate(0," + h / 2 + ")")
-        .call(xAxis);
+        .call(x_axis);
 
-    // Create draggable start circle
-    var startCircle = slider_svg.append("circle")
-        .attr("cy", h / 2)
-        .attr("r", r)
+    // Start bar
+    const start_bar = slider_svg.append("rect")
+        .attr("x", x_scale(start_value))
+        .attr("y", h / 2 - bar_height / 2)
+        .attr("width", bar_width * 2)
+        .attr("height", bar_height)
+        .attr("fill", bar_color)
+        .style("cursor", "pointer")
         .call(d3.drag()
-            .on("drag", draggedStart));
+            .on("drag", dragged_start_bar));
 
-    // Create draggable end circle
-    var endCircle = slider_svg.append("circle")
-        .attr("cy", h / 2)
-        .attr("r", r)
+    // End bar
+    const end_bar = slider_svg.append("rect")
+        .attr("x", x_scale(end_value))
+        .attr("y", h / 2 - bar_height / 2)
+        .attr("width", bar_width * 2)
+        .attr("height", bar_height)
+        .attr("fill", bar_hover_color)
+        .style("cursor", "pointer")
         .call(d3.drag()
-            .on("drag", draggedEnd));
+            .on("drag", dragged_end_bar));
 
-    startCircle.attr("cx", x(startValue));
 
-    endCircle.attr("cx", x(endValue));
+    start_bar.attr("x", x_scale(start_value));
+
+    end_bar.attr("x", x_scale(end_value));
+
+
+    const filled_color = bar_click_color;
+    let filled_width = Math.max(0, parseFloat(end_bar.attr("x")) - parseFloat(start_bar.attr("x")) - (bar_width * 2));
+
+    // Filled area between start_bar and end_bar
+    const filled_area = slider_svg.append("rect")
+        .attr("x", parseFloat(start_bar.attr("x")) + (bar_width * 2))
+        .attr("y", (h / 2) - (bar_height / 4))
+        .attr("width", filled_width)
+        .attr("height", bar_height / 2)
+        .attr("fill", filled_color);
 
     // Get x value from circle's cx
-    function getXValue(circle) {
-        return x.invert(circle.attr("cx"));
+    function get_x_value(bar) {
+        return x_scale.invert(bar.attr("x"));
     }
 
     // Drag functions
-    function draggedStart(event) {
+    function dragged_start_bar(event) {
         // Get proposed new value
-        var newValue = x.invert(event.x);
+        var current_value = x_scale.invert(event.x);
         // Limit based on end circle value
-        var endValue = getXValue(endCircle);
-        newValue = Math.min(newValue, endValue - scaledRadius * 2);
+        var end_bar_value = get_x_value(end_bar);
+        current_value = Math.min(current_value, end_bar_value - scaled_bar * 2);
         // Update start circle
-        startCircle.attr("cx", x(newValue));
-        show_fcn(matrix, newValue, "fcn_graph_start");
-        const msg = `Selected range: [${newValue}, ${endValue})`;
+        start_bar.attr("x", x_scale(current_value));
+        show_fcn(matrix, current_value, "fcn_graph_start");
+        const msg = `Selected range: [${current_value}, ${end_bar_value})`;
         $("#fcn").text(msg);
+        // Update filled area
+        filled_area.attr("x", parseFloat(start_bar.attr("x")) + bar_width * 2)
+            .attr("width", parseFloat(end_bar.attr("x")) - parseFloat(start_bar.attr("x")) - (bar_width * 2));
+
     }
 
-    function draggedEnd(event) {
+    function dragged_end_bar(event) {
 
         // Get proposed new value
-        var newValue = x.invert(event.x);
+        var current_value = x_scale.invert(event.x);
         // Limit based on start circle value
-        var startValue = getXValue(startCircle);
-        newValue = Math.max(newValue, startValue + scaledRadius * 2);
+        var start_bar_value = get_x_value(start_bar);
+        current_value = Math.max(current_value, start_bar_value + scaled_bar * 2);
         // Update end circle
-        endCircle.attr("cx", x(newValue));
-        show_fcn(matrix, newValue, "fcn_graph_end");
-        const msg = `Selected range: [${startValue}, ${newValue})`;
+        end_bar.attr("x", x_scale(current_value));
+        show_fcn(matrix, current_value, "fcn_graph_end");
+        const msg = `Selected range: [${start_bar_value}, ${current_value})`;
         $("#fcn").text(msg);
+        // Update filled area
+        filled_area.attr("x", parseFloat(start_bar.attr("x")) + bar_width * 2)
+            .attr("width", parseFloat(end_bar.attr("x")) - parseFloat(start_bar.attr("x")) - (bar_width * 2));
+
     }
 
     // Append the SVG element to the container
@@ -280,9 +310,6 @@ function show_fcn(matrix, max_distance, html_element_id) {
     max_distance += epsilon;
     $("#" + html_element_id + "_title").text(fcn_title);
     const container = d3.select("#" + html_element_id);
-    const bar_color = "#001E62";
-    const bar_hover_color = "#D50032";
-    const bar_click_color = "#FFBF3F";
     // Declare the chart dimensions and margins.
     const width = container.node().getBoundingClientRect().width;
     const height = 600;

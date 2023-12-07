@@ -41,7 +41,7 @@
                             </button>
                         </div>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body pt-1 pb-2">
                         <p class="card-text py-0 my-0">Supports
                             <span class="font-monospace">.txt</span> / <span class="font-monospace">.tsv</span> file
                             with tab separated values or
@@ -52,7 +52,7 @@
                             <input class="form-control form-control-sm" type="file" id="data_file">
                         </div>
                     </div>
-                    <div class="card-footer  bg-transparent border-0 text-center">
+                    <div class="card-footer p-0 m-0 bg-transparent border-0 text-center">
                         <div class="btn-group btn-group-sm" role="group" aria-label="Barcodes selection">
                             <input type="radio" class="btn-check" name="dimension_selection" id="2-dim"
                                    autocomplete="off" value="2"
@@ -70,7 +70,7 @@
             </div>
         </div>
         <div id="output">
-            <div class="row px-4 pt-2">
+            <div class="row px-4 py-0 my-0">
                 <div class="col-4">
                     <div class="card border-0">
                         <div class="card-header bg-transparent border-0 text-center">
@@ -94,7 +94,7 @@
                             <span class="d-block fw-light" id="fcn">
                                     Barcode range
                             </span>
-                            <div id="slider-container"></div>
+                            <div id="slider-container" class="text-dark"></div>
                         </div>
                         <div class="card-body py-0 my-0">
                             <div class="row py-0 my-0">
@@ -145,7 +145,7 @@
         $("#show_example").on("click", function () {
             file_matrix = null;
             $("#data_file").val('');
-            show_charts(dimension, file_matrix);
+            show_charts(dimension, file_matrix, color_palette);
         })
         $("#data_file").on("change", function (event) {
                 const file = event.target.files[0];
