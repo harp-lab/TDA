@@ -187,7 +187,7 @@ function show_slider(matrix, start_value = 0, end_value = 0) {
     slider_container.selectAll("svg").remove();
     // Width and height
     const w = slider_container.node().getBoundingClientRect().width - 30;
-    const h = 35;
+    const h = 40;
     const min_value = d3.min(values);
     const max_value = d3.max(values);
     if (start_value === 0 && end_value === 0) {
@@ -309,16 +309,16 @@ function show_fcn(matrix, max_distance, html_element_id) {
     let fcn_title = `${position} threshold ${max_distance}`;
     max_distance += epsilon;
     $("#" + html_element_id + "_title").text(fcn_title);
-    const container = d3.select("#" + html_element_id);
+    const fcn_container = d3.select("#" + html_element_id);
     // Declare the chart dimensions and margins.
-    const width = container.node().getBoundingClientRect().width;
+    const width = fcn_container.node().getBoundingClientRect().width;
     const height = 600;
     const margin_top = 20;
     const margin_right = 20;
     const margin_bottom = 20;
     const margin_left = 20;
     // Create the SVG container.
-    const svg = d3.create("svg")
+    const fcn_svg = d3.create("svg")
         .attr("width", width)
         .attr("height", height)
         .attr("viewBox", [-width / 2, -height / 2, width, height])
@@ -341,13 +341,40 @@ function show_fcn(matrix, max_distance, html_element_id) {
     // Create a simulation with several forces.
     const simulation = d3.forceSimulation(nodes)
         .force("link", d3.forceLink(links).id(d => d.id))
-        .force("charge", d3.forceManyBody().strength(-135)) // Adjust charge strength
-        .force("x", d3.forceX().strength(0.2)) // Adjust forceX strength
-        .force("y", d3.forceY().strength(0.2)); // Adjust forceY strength
+        .force("charge", d3.forceManyBody().strength(-100)) // Adjust charge strength
+        .force("x", d3.forceX().strength(0.15)) // Adjust forceX strength
+        .force("y", d3.forceY().strength(0.15)); // Adjust forceY strength
 
+    // Add zoom functionality
+    const zoom = d3.zoom()
+        .scaleExtent([1, 10])
+        .on("zoom", zoomed);
 
+    function zoomed(event) {
+        fcn_svg.selectAll('g').attr('transform', event.transform);
+        simulation.restart();
+    }
+
+    fcn_svg.call(zoom);
+
+    // Add drag functionality
+    const drag = d3.drag()
+        .on("start", (event, d) => {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        })
+        .on("drag", (event, d) => {
+            d.fx = event.x;
+            d.fy = event.y;
+        })
+        .on("end", (event, d) => {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        });
     // Add a line for each link, and a circle for each node.
-    const link = svg.append("g")
+    const link = fcn_svg.append("g")
         .attr("stroke", bar_hover_color)
         .attr("stroke-opacity", 0.6)
         .selectAll("line")
@@ -355,10 +382,11 @@ function show_fcn(matrix, max_distance, html_element_id) {
         .join("line")
         .attr("stroke-width", 2);
 
-    const node = svg.append("g")
+    const node = fcn_svg.append("g")
         .selectAll("g")
         .data(nodes)
         .join("g")
+        .call(drag) // Enable drag
         .on("mouseover", function (event, d) {
             const current_element = d3.select(this);
             const msg = `Node ${d.id}`;
@@ -404,7 +432,7 @@ function show_fcn(matrix, max_distance, html_element_id) {
         node
             .attr("transform", d => `translate(${d.x}, ${d.y})`);
     });
-    container.node().append(svg.node());
+    fcn_container.node().append(fcn_svg.node());
 
 }
 
