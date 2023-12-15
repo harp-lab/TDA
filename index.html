@@ -225,7 +225,7 @@
         $("#show_example").on("click", function () {
             file_matrix = null;
             $("#data_file").val('');
-            show_charts(dimension, file_matrix, color_palette);
+            show_charts(dimension, file_matrix);
         })
         $("#data_file").on("change", function (event) {
                 const file = event.target.files[0];
