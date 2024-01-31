@@ -107,98 +107,274 @@
 
     </header>
     <main>
-        <div class="row px-4 pt-0 mb-0">
-            <div class="col-6 offset-3">
-                <div class="card border-0">
-                    <div class="card-header border-0 lh-lg">
-                        Upload Functional Connectivity Network (FCN) Adjacency Matrix
-                        <div class="float-end">
-                            <button class="btn btn-sm btn-outline-dark text-decoration-none py-1 my-0"
-                                    id="show_example">
-                                <i class="bi bi-database"></i> Load Example Dataset
-                            </button>
+        <div class="row">
+<!--            first panel-->
+            <div class="col-4">
+                <div class="row px-0 pt-1 mb-0">
+                    <div class="col-12">
+                        <div class="card border-0">
+                            <div class="card-header border-0 lh-lg">
+                                <div class="d-block text-center m-auto">
+                                    <button class="btn btn-sm btn-outline-dark text-decoration-none py-1 my-0"
+                                            id="show_example_1">
+                                        <i class="bi bi-database"></i> Load <span class="badge bg-secondary">subject_1_mx645.txt</span> Dataset
+                                    </button>
+                                </div>
+                                Upload Functional Connectivity Network (FCN) Adjacency Matrix
+                            </div>
+                            <div class="card-body pt-1 pb-2">
+                                <div class="mb-0">
+                                    <input class="form-control form-control-sm" type="file" id="data_file_1">
+                                </div>
+                            </div>
+                            <div class="card-footer p-0 m-0 bg-transparent border-0 text-center">
+                                <div class="btn-group btn-group-sm" role="group" aria-label="Barcodes selection">
+                                    <input type="radio" class="btn-check" name="dimension_selection_1" id="2-dim_1"
+                                           autocomplete="off" value="2"
+                                           checked>
+                                    <label class="btn btn-outline-dark" for="2-dim_1">Visualize 2-dim barcodes</label>
+                                    <input type="radio" class="btn-check" name="dimension_selection_1" id="1-dim_1"
+                                           autocomplete="off" value="1">
+                                    <label class="btn btn-outline-dark" for="1-dim_1">Visualize 1-dim barcodes</label>
+                                    <input type="radio" class="btn-check" name="dimension_selection_1" id="0-dim_1"
+                                           autocomplete="off" value="0">
+                                    <label class="btn btn-outline-dark" for="0-dim_1">Visualize 0-dim barcodes</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="card-body pt-1 pb-2">
-                        <p class="card-text py-0 my-0">Supports
-                            <span class="font-monospace">.txt</span> / <span class="font-monospace">.tsv</span> file
-                            with tab separated values or
-                            <span class="font-monospace">.csv</span> file
-                            with comma separated values
-                        </p>
-                        <div class="mb-0">
-                            <input class="form-control form-control-sm" type="file" id="data_file">
+                </div>
+                <div id="output_1">
+                    <div class="row px-0 py-0 my-0">
+                        <div class="col-12">
+                            <div class="card border-0">
+                                <div class="card-header bg-transparent border-0 text-center">
+                                    <span id="dimension_value_1"></span> Dimensional Barcodes
+                                    <span class="d-block fw-light">
+                                    (Click a barcode to view FCN, then zoom and drag to adjust width)
+                            </span>
+                                </div>
+                                <div class="card-body">
+                                    <div id="barcodes_1" class="bg-light text-center">
+
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="card-footer p-0 m-0 bg-transparent border-0 text-center">
-                        <div class="btn-group btn-group-sm" role="group" aria-label="Barcodes selection">
-                            <input type="radio" class="btn-check" name="dimension_selection" id="2-dim"
-                                   autocomplete="off" value="2"
-                                   checked>
-                            <label class="btn btn-outline-dark" for="2-dim">Visualize 2-dim barcodes</label>
-                            <input type="radio" class="btn-check" name="dimension_selection" id="1-dim"
-                                   autocomplete="off" value="1">
-                            <label class="btn btn-outline-dark" for="1-dim">Visualize 1-dim barcodes</label>
-                            <input type="radio" class="btn-check" name="dimension_selection" id="0-dim"
-                                   autocomplete="off" value="0">
-                            <label class="btn btn-outline-dark" for="0-dim">Visualize 0-dim barcodes</label>
+
+                        <div class="col-12">
+                            <div class="card border-0">
+                                <div class="card-header bg-transparent border-0 text-center py-0 my-0 ">
+                                    Network
+                                    <span class="d-block fw-light" id="fcn_1">
+                                    Barcode range
+                            </span>
+                                    <div id="slider-container_1" class="text-dark"></div>
+                                </div>
+                                <div class="card-body py-0 my-0">
+                                    <div class="row py-0 my-0">
+                                        <div class="col-6 p-0 m-0">
+                                            <p class="text-center my-0 py-0 text-capitalize"
+                                               id="fcn_graph_start_title_1">
+                                                Bar start threshold
+                                            </p>
+                                            <div id="fcn_graph_start_1" class="text-center"></div>
+                                        </div>
+                                        <div class="col-6 p-0 m-0">
+                                            <p class="text-center my-0 py-0 text-capitalize" id="fcn_graph_end_title_1">
+                                                Bar end threshold
+                                            </p>
+                                            <div id="fcn_graph_end_1" class="text-center"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
+
+
                     </div>
                 </div>
             </div>
-        </div>
-        <div id="output">
-            <div class="row px-4 py-0 my-0">
-                <div class="col-4">
-                    <div class="card border-0">
-                        <div class="card-header bg-transparent border-0 text-center">
-                            <span id="dimension_value"></span> Dimensional Barcodes
-                            <span class="d-block fw-light">
+<!--            second panel-->
+            <div class="col-4">
+                <div class="row px-0 pt-1 mb-0">
+                    <div class="col-12">
+                        <div class="card border-0">
+                            <div class="card-header border-0 lh-lg">
+                                <div class="d-block text-center m-auto">
+                                    <button class="btn btn-sm btn-outline-dark text-decoration-none py-1 my-0"
+                                            id="show_example_2">
+                                        <i class="bi bi-database"></i> Load <span class="badge bg-secondary">subject_1_mx1400.txt</span> Dataset
+                                    </button>
+                                </div>
+                                Upload Functional Connectivity Network (FCN) Adjacency Matrix
+                            </div>
+                            <div class="card-body pt-1 pb-2">
+                                <div class="mb-0">
+                                    <input class="form-control form-control-sm" type="file" id="data_file_2">
+                                </div>
+                            </div>
+                            <div class="card-footer p-0 m-0 bg-transparent border-0 text-center">
+                                <div class="btn-group btn-group-sm" role="group" aria-label="Barcodes selection">
+                                    <input type="radio" class="btn-check" name="dimension_selection_2" id="2-dim_2"
+                                           autocomplete="off" value="2"
+                                           checked>
+                                    <label class="btn btn-outline-dark" for="2-dim_2">Visualize 2-dim barcodes</label>
+                                    <input type="radio" class="btn-check" name="dimension_selection_2" id="1-dim_2"
+                                           autocomplete="off" value="1">
+                                    <label class="btn btn-outline-dark" for="1-dim_2">Visualize 1-dim barcodes</label>
+                                    <input type="radio" class="btn-check" name="dimension_selection_2" id="0-dim_2"
+                                           autocomplete="off" value="0">
+                                    <label class="btn btn-outline-dark" for="0-dim_2">Visualize 0-dim barcodes</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="output_2">
+                    <div class="row px-0 py-0 my-0">
+                        <div class="col-12">
+                            <div class="card border-0">
+                                <div class="card-header bg-transparent border-0 text-center">
+                                    <span id="dimension_value_2"></span> Dimensional Barcodes
+                                    <span class="d-block fw-light">
                                     (Click a barcode to view FCN, then zoom and drag to adjust width)
                             </span>
-                        </div>
-                        <div class="card-body">
-                            <div id="barcodes" class="bg-light text-center">
+                                </div>
+                                <div class="card-body">
+                                    <div id="barcodes_2" class="bg-light text-center">
 
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                <div class="col-8">
-                    <div class="card border-0">
-                        <div class="card-header bg-transparent border-0 text-center">
-                            Network
-                            <span class="d-block fw-light" id="fcn">
+                        <div class="col-12">
+                            <div class="card border-0">
+                                <div class="card-header bg-transparent border-0 text-center py-0 my-0 ">
+                                    Network
+                                    <span class="d-block fw-light" id="fcn_2">
                                     Barcode range
                             </span>
-                            <div id="slider-container" class="text-dark"></div>
-                        </div>
-                        <div class="card-body py-0 my-0">
-                            <div class="row py-0 my-0">
-                                <div class="col-6 p-0 m-0">
-                                    <div id="fcn_graph_start" class="text-center"></div>
-                                    <p class="text-center my-0 py-0 text-capitalize" id="fcn_graph_start_title">
-                                        Bar start threshold
-                                    </p>
+                                    <div id="slider-container_2" class="text-dark"></div>
                                 </div>
-                                <div class="col-6 p-0 m-0">
-                                    <div id="fcn_graph_end" class="text-center"></div>
-                                    <p class="text-center my-0 py-0 text-capitalize" id="fcn_graph_end_title">
-                                        Bar end threshold
-                                    </p>
+                                <div class="card-body py-0 my-0">
+                                    <div class="row py-0 my-0">
+                                        <div class="col-6 p-0 m-0">
+                                            <p class="text-center my-0 py-0 text-capitalize"
+                                               id="fcn_graph_start_title_2">
+                                                Bar start threshold
+                                            </p>
+                                            <div id="fcn_graph_start_2" class="text-center"></div>
+                                        </div>
+                                        <div class="col-6 p-0 m-0">
+                                            <p class="text-center my-0 py-0 text-capitalize" id="fcn_graph_end_title_2">
+                                                Bar end threshold
+                                            </p>
+                                            <div id="fcn_graph_end_2" class="text-center"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+<!--            third panel-->
+            <div class="col-4">
+                <div class="row px-0 pt-1 mb-0">
+                    <div class="col-12">
+                        <div class="card border-0">
+                            <div class="card-header border-0 lh-lg">
+                                <div class="d-block text-center m-auto">
+                                    <button class="btn btn-sm btn-outline-dark text-decoration-none py-1 my-0"
+                                            id="show_example_3">
+                                        <i class="bi bi-database"></i> Load <span class="badge bg-secondary">subject_1_std2500.txt</span> Dataset
+                                    </button>
+                                </div>
+                                Upload Functional Connectivity Network (FCN) Adjacency Matrix
+                            </div>
+                            <div class="card-body pt-1 pb-2">
+                                <div class="mb-0">
+                                    <input class="form-control form-control-sm" type="file" id="data_file_3">
+                                </div>
+                            </div>
+                            <div class="card-footer p-0 m-0 bg-transparent border-0 text-center">
+                                <div class="btn-group btn-group-sm" role="group" aria-label="Barcodes selection">
+                                    <input type="radio" class="btn-check" name="dimension_selection_3" id="2-dim_3"
+                                           autocomplete="off" value="2"
+                                           checked>
+                                    <label class="btn btn-outline-dark" for="2-dim_3">Visualize 2-dim barcodes</label>
+                                    <input type="radio" class="btn-check" name="dimension_selection_3" id="1-dim_3"
+                                           autocomplete="off" value="1">
+                                    <label class="btn btn-outline-dark" for="1-dim_3">Visualize 1-dim barcodes</label>
+                                    <input type="radio" class="btn-check" name="dimension_selection_3" id="0-dim_3"
+                                           autocomplete="off" value="0">
+                                    <label class="btn btn-outline-dark" for="0-dim_3">Visualize 0-dim barcodes</label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+                <div id="output_3">
+                    <div class="row px-0 py-0 my-0">
+                        <div class="col-12">
+                            <div class="card border-0">
+                                <div class="card-header bg-transparent border-0 text-center">
+                                    <span id="dimension_value_3"></span> Dimensional Barcodes
+                                    <span class="d-block fw-light">
+                                    (Click a barcode to view FCN, then zoom and drag to adjust width)
+                            </span>
+                                </div>
+                                <div class="card-body">
+                                    <div id="barcodes_3" class="bg-light text-center">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="card border-0">
+                                <div class="card-header bg-transparent border-0 text-center py-0 my-0 ">
+                                    Network
+                                    <span class="d-block fw-light" id="fcn_3">
+                                    Barcode range
+                            </span>
+                                    <div id="slider-container_3" class="text-dark"></div>
+                                </div>
+                                <div class="card-body py-0 my-0">
+                                    <div class="row py-0 my-0">
+                                        <div class="col-6 p-0 m-0">
+                                            <p class="text-center my-0 py-0 text-capitalize"
+                                               id="fcn_graph_start_title_3">
+                                                Bar start threshold
+                                            </p>
+                                            <div id="fcn_graph_start_3" class="text-center"></div>
+                                        </div>
+                                        <div class="col-6 p-0 m-0">
+                                            <p class="text-center my-0 py-0 text-capitalize" id="fcn_graph_end_title_3">
+                                                Bar end threshold
+                                            </p>
+                                            <div id="fcn_graph_end_3" class="text-center"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
 
+                    </div>
+                </div>
             </div>
         </div>
     </main>
 </div>
-<div id="diagram" class="d-none"></div>
+<div id="diagram_1" class="d-none"></div>
+<div id="diagram_2" class="d-none"></div>
+<div id="diagram_3" class="d-none"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"
         integrity="sha512-M7nHCiNUOwFt6Us3r8alutZLm9qMt4s9951uo8jqO4UwJ1hziseL6O3ndFyigx6+LREfZqnhHxYjKRJ8ZQ69DQ=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -211,34 +387,43 @@
 <script src="web_app/barcodes.js"></script>
 <script>
     $(document).ready(function () {
-        $("#output").hide();
         const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
         const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
-        let dimension = 2;
-        let file_matrix = null;
 
-        $('input[name="dimension_selection"]').on('click', function () {
-            dimension = parseInt($(this).val());
-            show_charts(dimension, file_matrix);
-        });
 
-        $("#show_example").on("click", function () {
-            file_matrix = null;
-            $("#data_file").val('');
-            show_charts(dimension, file_matrix);
-        })
-        $("#data_file").on("change", function (event) {
-                const file = event.target.files[0];
-                if (file) {
-                    read_file(file).then(function (matrix) {
-                        file_matrix = matrix;
-                        show_charts(dimension, file_matrix);
-                    }).catch(function (error) {
-                        console.error(error.message);
-                    });
+        function show_panel(panel_id) {
+            $("#output_"+panel_id).hide();
+            let dimension = 2;
+            let file_matrix = null;
+            let dimension_selection = 'input[name="dimension_selection_'+panel_id+'"]';
+            console.log(dimension_selection);
+            $(dimension_selection).on('click', function () {
+                dimension = parseInt($(this).val());
+                show_charts(dimension, file_matrix, panel_id);
+            });
+
+            $("#show_example_"+panel_id).on("click", function () {
+                $("#data_file").val('');
+                show_charts(dimension, file_matrix, panel_id);
+            })
+            $("#data_file_"+panel_id).on("change", function (event) {
+                    const file = event.target.files[0];
+                    if (file) {
+                        read_file(file).then(function (matrix) {
+                            file_matrix = matrix;
+                            show_charts(dimension, file_matrix, panel_id);
+                        }).catch(function (error) {
+                            console.error(error.message);
+                        });
+                    }
                 }
-            }
-        )
+            )
+        }
+
+        show_panel(1);
+        show_panel(2);
+        show_panel(3);
+
     });
 
 </script>

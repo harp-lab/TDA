@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description"
+          content="0 dim barcodes visualization">
+    <meta name="author" content="Ahmedur Rahman Shovon">
+    <meta name="keywords"
+          content="barcodes">
+    <link rel="canonical"
+          href="/"/>
+
+    <title>Persistent Barcodes Visualization</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css">
+</head>
+
+<body class="d-flex flex-column min-vh-100 py-2">
+<div class="container-fluid bg-white">
+    <header class="d-block border-bottom">
+        <a href="" class="link-body-emphasis text-decoration-none">
+        <span class="fs-4">
+            <i class="bi bi-bar-chart-steps"></i> Persistent Barcodes Visualization
+        </span>
+        </a>
+
+        <div class="float-end">
+            <button class="align-middle m-auto btn btn-outline-dark btn-sm text-decoration-none"
+                    data-bs-toggle="modal" data-bs-target="#how_to_use_modal"
+                    title="How to use the visualization">
+                <i class="bi bi-info-circle"></i> How to use
+            </button>
+            <a class="align-middle m-auto btn btn-outline-dark btn-sm text-decoration-none"
+               href="https://github.com/harp-lab/TDA"
+               data-bs-toggle="tooltip" data-bs-placement="left"
+               title="Github Code Repository">
+                <i class="bi bi-github"></i> Code
+            </a>
+        </div>
+        <!-- Modal -->
+        <div class="modal fade" id="how_to_use_modal" tabindex="-1" aria-labelledby="how_to_use_modal"
+             aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">How to use Persistent Barcodes Visualization
+                            Tool</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <ol class="list-group list-group-numbered">
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">Upload/Load Dataset</div>
+                                    Upload Functional Connectivity Network (FCN) Adjacency Matrix file
+                                    (<code>.txt</code>, <code>.tsv</code>, or <code>.csv</code> format). Alternatively,
+                                    click the
+                                    <span class="badge text-bg-secondary">Load Example Dataset</span> button to load a
+                                    113 x 113 FCN data
+                                    sample.
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">Select Barcodes Dimension</div>
+                                    Select the persistent barcodes dimension by clicking the <span
+                                        class="badge text-bg-secondary">Visualize 2-dim barcodes</span>,
+                                    <span class="badge text-bg-secondary">Visualize 1-dim barcodes</span>, or <span
+                                        class="badge text-bg-secondary">Visualize 0-dim barcodes</span> button.
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">Click Barcode</div>
+                                    Click a barcode on the left side view. This will visualize two networks on the right
+                                    side. The first network is constructed using the starting threshold of the bar, and
+                                    the
+                                    second one uses the ending threshold.
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">Zoom and Drag Views</div>
+                                    Optionally, you can zoom and drag the barcodes view to adjust the width of the
+                                    bars. You
+                                    can also zoom in and out on the networks using the mouse scroll wheel.
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-start">
+                                <div class="ms-2 me-auto">
+                                    <div class="fw-bold">Range Slider</div>
+                                    Use the range slider to manually select start and end thresholds for the networks.
+                                </div>
+                            </li>
+                        </ol>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </header>
+    <main>
+        <div class="row px-4 pt-0 mb-0">
+            <div class="col-6 offset-3">
+                <div class="card border-0">
+                    <div class="card-header border-0 lh-lg">
+                        Upload Functional Connectivity Network (FCN) Adjacency Matrix
+                        <div class="float-end">
+                            <button class="btn btn-sm btn-outline-dark text-decoration-none py-1 my-0"
+                                    id="show_example">
+                                <i class="bi bi-database"></i> Load Example Dataset
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body pt-1 pb-2">
+                        <p class="card-text py-0 my-0">Supports
+                            <span class="font-monospace">.txt</span> / <span class="font-monospace">.tsv</span> file
+                            with tab separated values or
+                            <span class="font-monospace">.csv</span> file
+                            with comma separated values
+                        </p>
+                        <div class="mb-0">
+                            <input class="form-control form-control-sm" type="file" id="data_file">
+                        </div>
+                    </div>
+                    <div class="card-footer p-0 m-0 bg-transparent border-0 text-center">
+                        <div class="btn-group btn-group-sm" role="group" aria-label="Barcodes selection">
+                            <input type="radio" class="btn-check" name="dimension_selection" id="2-dim"
+                                   autocomplete="off" value="2"
+                                   checked>
+                            <label class="btn btn-outline-dark" for="2-dim">Visualize 2-dim barcodes</label>
+                            <input type="radio" class="btn-check" name="dimension_selection" id="1-dim"
+                                   autocomplete="off" value="1">
+                            <label class="btn btn-outline-dark" for="1-dim">Visualize 1-dim barcodes</label>
+                            <input type="radio" class="btn-check" name="dimension_selection" id="0-dim"
+                                   autocomplete="off" value="0">
+                            <label class="btn btn-outline-dark" for="0-dim">Visualize 0-dim barcodes</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="output">
+            <div class="row px-4 py-0 my-0">
+                <div class="col-4">
+                    <div class="card border-0">
+                        <div class="card-header bg-transparent border-0 text-center">
+                            <span id="dimension_value"></span> Dimensional Barcodes
+                            <span class="d-block fw-light">
+                                    (Click a barcode to view FCN, then zoom and drag to adjust width)
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <div id="barcodes" class="bg-light text-center">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-8">
+                    <div class="card border-0">
+                        <div class="card-header bg-transparent border-0 text-center">
+                            Network
+                            <span class="d-block fw-light" id="fcn">
+                                    Barcode range
+                            </span>
+                            <div id="slider-container" class="text-dark"></div>
+                        </div>
+                        <div class="card-body py-0 my-0">
+                            <div class="row py-0 my-0">
+                                <div class="col-6 p-0 m-0">
+                                    <div id="fcn_graph_start" class="text-center"></div>
+                                    <p class="text-center my-0 py-0 text-capitalize" id="fcn_graph_start_title">
+                                        Bar start threshold
+                                    </p>
+                                </div>
+                                <div class="col-6 p-0 m-0">
+                                    <div id="fcn_graph_end" class="text-center"></div>
+                                    <p class="text-center my-0 py-0 text-capitalize" id="fcn_graph_end_title">
+                                        Bar end threshold
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </main>
+</div>
+<div id="diagram" class="d-none"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"
+        integrity="sha512-M7nHCiNUOwFt6Us3r8alutZLm9qMt4s9951uo8jqO4UwJ1hziseL6O3ndFyigx6+LREfZqnhHxYjKRJ8ZQ69DQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
+        integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
+<script src="web_app/ripser_npm.js"></script>
+<script src="web_app/single_barcodes.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#output").hide();
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+        let dimension = 2;
+        let file_matrix = null;
+
+        $('input[name="dimension_selection"]').on('click', function () {
+            dimension = parseInt($(this).val());
+            show_charts(dimension, file_matrix);
+        });
+
+        $("#show_example").on("click", function () {
+            file_matrix = null;
+            $("#data_file").val('');
+            show_charts(dimension, file_matrix);
+        })
+        $("#data_file").on("change", function (event) {
+                const file = event.target.files[0];
+                if (file) {
+                    read_file(file).then(function (matrix) {
+                        file_matrix = matrix;
+                        show_charts(dimension, file_matrix);
+                    }).catch(function (error) {
+                        console.error(error.message);
+                    });
+                }
+            }
+        )
+    });
+
+</script>
+
+</body>
+</html>

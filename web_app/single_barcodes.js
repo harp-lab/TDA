@@ -22,18 +22,18 @@ async function get_static_data(file_path) {
 }
 
 
-function show_barcode(barcodes, matrix, id_number) {
-    $("#barcodes_" + id_number).empty();
+function show_barcode(barcodes, matrix) {
+    $("#barcodes").empty();
     // Select the container with id "barcodes"
-    const barcodes_container = d3.select("#barcodes_" + id_number);
+    const barcodes_container = d3.select("#barcodes");
     // Remove existing SVG content
     barcodes_container.selectAll("svg").remove();
     // Declare the chart dimensions and margins.
     const margin_top = 20;
-    const margin_right = 5;
-    const margin_bottom = 5;
-    const margin_left = 5;
-    const width = barcodes_container.node().getBoundingClientRect().width - 20;
+    const margin_right = 20;
+    const margin_bottom = 20;
+    const margin_left = 20;
+    const width = barcodes_container.node().getBoundingClientRect().width - 30;
     const bar_height = 10; // Fixed height for the bars
 
     // Calculate the height of the SVG container based on the number of bars
@@ -102,25 +102,25 @@ function show_barcode(barcodes, matrix, id_number) {
         })
         .on("click", function (event, d) {
             const current_element = d3.select(this);
-            $("#fcn_" + id_number).empty();
-            $("#fcn_graph_start_" + id_number).empty();
-            $("#fcn_graph_end_" + id_number).empty();
+            $("#fcn").empty();
+            $("#fcn_graph_start").empty();
+            $("#fcn_graph_end").empty();
             if (current_element.attr("clicked") === "false") {
                 $(".bar").attr("fill", bar_color);
                 $(".bar").attr("clicked", "false");
                 current_element.attr("fill", bar_click_color);
                 current_element.attr("clicked", "true");
                 const msg = `Selected barcode: [${d[0]}, ${d[1]})`;
-                $("#fcn_" + id_number).text(msg);
-                show_fcn(matrix, d[0], "fcn_graph_start_" + id_number, id_number);
-                show_fcn(matrix, d[1], "fcn_graph_end_" + id_number, id_number);
-                show_slider(matrix, d[0], d[1], id_number);
+                $("#fcn").text(msg);
+                show_fcn(matrix, d[0], "fcn_graph_start");
+                show_fcn(matrix, d[1], "fcn_graph_end");
+                show_slider(matrix, d[0], d[1]);
             } else {
                 current_element.attr("fill", bar_color);
                 current_element.attr("clicked", "false");
-                show_fcn(matrix, 0, "fcn_graph_start_" + id_number, id_number);
-                show_fcn(matrix, 0, "fcn_graph_end_" + id_number, id_number);
-                show_slider(matrix, d[0], d[1], id_number);
+                show_fcn(matrix, 0, "fcn_graph_start");
+                show_fcn(matrix, 0, "fcn_graph_end");
+                show_slider(matrix, d[0], d[1]);
             }
         });
 
@@ -173,16 +173,16 @@ function show_barcode(barcodes, matrix, id_number) {
 
 }
 
-function show_slider(matrix, start_value = 0, end_value = 0, id_number) {
+function show_slider(matrix, start_value = 0, end_value = 0) {
     // Flatten the matrix
     let flattened_values = matrix.flat();
 
     // Get unique values using Set
     let values = [...new Set(flattened_values)].sort();
 
-    $("#slider-container_" + id_number).empty();
+    $("#slider-container").empty();
     // Select the container with id "barcodes"
-    const slider_container = d3.select("#slider-container_" + id_number);
+    const slider_container = d3.select("#slider-container");
     // Remove existing SVG content
     slider_container.selectAll("svg").remove();
     // Width and height
@@ -192,7 +192,7 @@ function show_slider(matrix, start_value = 0, end_value = 0, id_number) {
     const max_value = d3.max(values);
     if (start_value === 0 && end_value === 0) {
         const msg = `Selected range: [0, 0)`;
-        $("#fcn_" + id_number).text(msg);
+        $("#fcn").text(msg);
     }
 
     // Create SVG element
@@ -271,9 +271,9 @@ function show_slider(matrix, start_value = 0, end_value = 0, id_number) {
         current_value = Math.min(current_value, end_bar_value - scaled_bar * 2);
         // Update start circle
         start_bar.attr("x", x_scale(current_value));
-        show_fcn(matrix, current_value, "fcn_graph_start_" + id_number, id_number);
+        show_fcn(matrix, current_value, "fcn_graph_start");
         const msg = `Selected range: [${current_value}, ${end_bar_value})`;
-        $("#fcn_" + id_number).text(msg);
+        $("#fcn").text(msg);
         // Update filled area
         filled_area.attr("x", parseFloat(start_bar.attr("x")) + bar_width * 2)
             .attr("width", parseFloat(end_bar.attr("x")) - parseFloat(start_bar.attr("x")) - (bar_width * 2));
@@ -289,9 +289,9 @@ function show_slider(matrix, start_value = 0, end_value = 0, id_number) {
         current_value = Math.max(current_value, start_bar_value + scaled_bar * 2);
         // Update end circle
         end_bar.attr("x", x_scale(current_value));
-        show_fcn(matrix, current_value, "fcn_graph_end_" + id_number, id_number);
+        show_fcn(matrix, current_value, "fcn_graph_end");
         const msg = `Selected range: [${start_bar_value}, ${current_value})`;
-        $("#fcn_" + id_number).text(msg);
+        $("#fcn").text(msg);
         // Update filled area
         filled_area.attr("x", parseFloat(start_bar.attr("x")) + bar_width * 2)
             .attr("width", parseFloat(end_bar.attr("x")) - parseFloat(start_bar.attr("x")) - (bar_width * 2));
@@ -302,7 +302,7 @@ function show_slider(matrix, start_value = 0, end_value = 0, id_number) {
     slider_container.node().append(slider_svg.node());
 }
 
-function show_fcn(matrix, max_distance, html_element_id, id_number) {
+function show_fcn(matrix, max_distance, html_element_id) {
     const epsilon = 1e-5;
     $("#" + html_element_id).empty();
     const position = html_element_id.split("_").pop();
@@ -312,11 +312,11 @@ function show_fcn(matrix, max_distance, html_element_id, id_number) {
     const fcn_container = d3.select("#" + html_element_id);
     // Declare the chart dimensions and margins.
     const width = fcn_container.node().getBoundingClientRect().width;
-    const height = 300;
-    const margin_top = 5;
-    const margin_right = 5;
-    const margin_bottom = 5;
-    const margin_left = 5;
+    const height = 600;
+    const margin_top = 20;
+    const margin_right = 20;
+    const margin_bottom = 20;
+    const margin_left = 20;
     // Create the SVG container.
     const fcn_svg = d3.create("svg")
         .attr("width", width)
@@ -341,9 +341,9 @@ function show_fcn(matrix, max_distance, html_element_id, id_number) {
     // Create a simulation with several forces.
     const simulation = d3.forceSimulation(nodes)
         .force("link", d3.forceLink(links).id(d => d.id))
-        .force("charge", d3.forceManyBody().strength(-37)) // Adjust charge strength
-        .force("x", d3.forceX().strength(0.20)) // Adjust forceX strength
-        .force("y", d3.forceY().strength(0.20)); // Adjust forceY strength
+        .force("charge", d3.forceManyBody().strength(-100)) // Adjust charge strength
+        .force("x", d3.forceX().strength(0.15)) // Adjust forceX strength
+        .force("y", d3.forceY().strength(0.15)); // Adjust forceY strength
 
     // Add zoom functionality
     const zoom = d3.zoom()
@@ -376,7 +376,7 @@ function show_fcn(matrix, max_distance, html_element_id, id_number) {
     // Add a line for each link, and a circle for each node.
     const link = fcn_svg.append("g")
         .attr("stroke", bar_hover_color)
-        .attr("stroke-opacity", 0.9)
+        .attr("stroke-opacity", 0.6)
         .selectAll("line")
         .data(links)
         .join("line")
@@ -405,7 +405,7 @@ function show_fcn(matrix, max_distance, html_element_id, id_number) {
         });
 
     node.append("circle")
-        .attr("r", 8)
+        .attr("r", 12)
         .attr("fill", bar_color)
         .style("stroke-width", 1);
 
@@ -414,7 +414,7 @@ function show_fcn(matrix, max_distance, html_element_id, id_number) {
         .style("text-anchor", "middle")
         .attr("y", 3)
         .style("stroke", "white")
-        .style("font-size", "8px")
+        .style("font-size", "10px")
         .style("stroke-width", 1)
         .style("pointer-events", "none")
         .text(function (d) {
@@ -458,62 +458,49 @@ async function read_file(file) {
 }
 
 
-function after_computation(matrix, panel_id) {
+function after_computation(matrix) {
     let barcodes = [];
-    $('#diagram_' + panel_id + ' svg rect').each(function () {
+    $('#diagram svg rect').each(function () {
         const title = $(this).find('title');
         if (title.length > 0) {
             const values = title.text().replace(/[\[\],)]/g, '').replace(/[\s]/g, '-').split('-');
             barcodes.push([parseFloat(values[0]), parseFloat(values[1])]);
         }
     });
-    show_barcode(barcodes, matrix, panel_id);
-    show_fcn(matrix, 0, "fcn_graph_start_" + panel_id, panel_id);
-    show_fcn(matrix, 0, "fcn_graph_end_" + panel_id, panel_id);
+    show_barcode(barcodes, matrix);
+    show_fcn(matrix, 0, "fcn_graph_start");
+    show_fcn(matrix, 0, "fcn_graph_end");
 }
 
-function perform_data_change(matrix, dimension, panel_id) {
-    $("#output_" + panel_id).show();
+function perform_data_change(matrix, dimension) {
+    $("#output").show();
     // Empty the existing diagram content which is generated by ripser
-    $("#diagram_" + panel_id).empty();
-    $("#fcn_" + panel_id).empty();
+    $("#diagram").empty();
+    $("#fcn").empty();
 
-    show_slider(matrix, 0, 0, panel_id);
+    show_slider(matrix);
 
     const ripser_options = {
         format: "distance",
         minDim: dimension,
         maxDim: dimension,
-        callback: after_computation.bind(null, matrix, panel_id)
+        callback: after_computation.bind(null, matrix)
     };
-    Ripser.run(matrix, "#diagram_"+panel_id, ripser_options);
+    Ripser.run(matrix, "#diagram", ripser_options);
 }
 
-function show_charts(dimension, file_matrix, panel_id) {
-    const file_1 = "data/ph_data/subject_1_mx645.txt";
-    const file_2 = "data/ph_data/subject_1_mx1400.txt";
-    const file_3 = "data/ph_data/subject_1_std2500.txt";
-
-    $("#dimension_value_" + panel_id).text(dimension);
+function show_charts(dimension, file_matrix) {
+    $("#dimension_value").text(dimension);
     let file = "data/demo_data.txt";
     file = "data/temporal_data/normalize_dfc_2500_subject_1_time_1.txt";
     if (file && file_matrix === null) {
-        if(panel_id == 1) {
-            file = file_1;
-        }
-        else if(panel_id == 2) {
-            file = file_2;
-        }
-        else if(panel_id == 3) {
-            file = file_3;
-        }
         get_static_data(file).then(function (matrix) {
-            perform_data_change(matrix, dimension, panel_id);
+            perform_data_change(matrix, dimension);
         }).catch(function (error) {
             console.error(error.message);
         });
     } else if (file_matrix !== null) {
-        perform_data_change(file_matrix, dimension, panel_id);
+        perform_data_change(file_matrix, dimension);
     }
 }
 
