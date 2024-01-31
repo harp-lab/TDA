@@ -106,8 +106,8 @@ function show_barcode(barcodes, matrix, id_number) {
             $("#fcn_graph_start_" + id_number).empty();
             $("#fcn_graph_end_" + id_number).empty();
             if (current_element.attr("clicked") === "false") {
-                $(".bar").attr("fill", bar_color);
-                $(".bar").attr("clicked", "false");
+                $("#barcodes_" + id_number + " svg .bar").attr("fill", bar_color);
+                $("#barcodes_" + id_number + " svg .bar").attr("clicked", "false");
                 current_element.attr("fill", bar_click_color);
                 current_element.attr("clicked", "true");
                 const msg = `Selected barcode: [${d[0]}, ${d[1]})`;
@@ -305,7 +305,7 @@ function show_slider(matrix, start_value = 0, end_value = 0, id_number) {
 function show_fcn(matrix, max_distance, html_element_id, id_number) {
     const epsilon = 1e-5;
     $("#" + html_element_id).empty();
-    const position = html_element_id.split("_").pop();
+    const position = html_element_id.split("_")[2];
     let fcn_title = `${position} threshold ${max_distance}`;
     max_distance += epsilon;
     $("#" + html_element_id + "_title").text(fcn_title);
@@ -486,27 +486,30 @@ function perform_data_change(matrix, dimension, panel_id) {
         maxDim: dimension,
         callback: after_computation.bind(null, matrix, panel_id)
     };
-    Ripser.run(matrix, "#diagram_"+panel_id, ripser_options);
+    Ripser.run(matrix, "#diagram_" + panel_id, ripser_options);
 }
 
-function show_charts(dimension, file_matrix, panel_id) {
+function show_dataset_info(panel_id, filename) {
+    let dataset_info = '(Loaded <span class="badge bg-secondary">' + filename + '</span> dataset)';
+    $("#dataset_info_" + panel_id).html(dataset_info);
+}
+
+function show_charts(dimension, file_matrix, panel_id, show_example = 0) {
     const file_1 = "data/ph_data/subject_1_mx645.txt";
     const file_2 = "data/ph_data/subject_1_mx1400.txt";
     const file_3 = "data/ph_data/subject_1_std2500.txt";
 
     $("#dimension_value_" + panel_id).text(dimension);
-    let file = "data/demo_data.txt";
-    file = "data/temporal_data/normalize_dfc_2500_subject_1_time_1.txt";
-    if (file && file_matrix === null) {
-        if(panel_id == 1) {
-            file = file_1;
-        }
-        else if(panel_id == 2) {
-            file = file_2;
-        }
-        else if(panel_id == 3) {
-            file = file_3;
-        }
+    let file = "data/temporal_data/normalize_dfc_2500_subject_1_time_1.txt";
+    if (panel_id == 1) {
+        file = file_1;
+    } else if (panel_id == 2) {
+        file = file_2;
+    } else if (panel_id == 3) {
+        file = file_3;
+    }
+    if ((file && show_example === 1) || (file && file_matrix === null)) {
+        show_dataset_info(panel_id, file);
         get_static_data(file).then(function (matrix) {
             perform_data_change(matrix, dimension, panel_id);
         }).catch(function (error) {
