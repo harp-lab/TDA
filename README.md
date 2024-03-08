@@ -158,3 +158,4 @@ Live demo: [TDA webapp](https://harp-lab.github.io/TDA/)
 
 - [Ripser online tool](https://live.ripser.org/)
 - [Ripser Github repository](https://github.com/Ripser/ripser)
+- [ROI names](https://github.com/ThomasYeoLab/CBIG/blob/master/stable_projects/brain_parcellation/Yeo2011_fcMRI_clustering/1000subjects_reference/Yeo_JNeurophysiol11_SplitLabels/MNI152/Centroid_coordinates/Yeo2011_17Networks_N1000.split_components.FSL_MNI152_2mm.Centroid_RAS.csv)

@@ -2,6 +2,24 @@ var bar_color = "#001E62";
 var bar_hover_color = "#D50032";
 var bar_click_color = "#FFBF3F";
 
+function filter_default_mode_network(matrix) {
+    // Default mode network's row and column ranges to keep
+    const node_ranges = [[43, 54], [100, 111]];
+    let new_matrix = [];
+    for (let range_i = 0; range_i < node_ranges.length; range_i++) {
+        for (let row = node_ranges[range_i][0]; row <= node_ranges[range_i][1]; row++) {
+            let temp_row = [];
+            for (let range_j = 0; range_j < node_ranges.length; range_j++) {
+                for (let column = node_ranges[range_j][0]; column <= node_ranges[range_j][1]; column++) {
+                    temp_row.push(matrix[row][column]);
+                }
+            }
+            new_matrix.push(temp_row);
+        }
+    }
+    return new_matrix;
+
+}
 
 async function get_static_data(file_path) {
     let data_file = "data/fmri_data/normalize_dfc_2500_subject_1_time_1.txt";
@@ -16,6 +34,11 @@ async function get_static_data(file_path) {
             matrix = d3.csvParseRows(text, (row) => row.map((value) => +value));
         } else {
             matrix = d3.tsvParseRows(text, (row) => row.map((value) => +value));
+        }
+        if (matrix) {
+            if (matrix.length == 113 && matrix[0].length == 113) {
+                return filter_default_mode_network(matrix);
+            }
         }
         return matrix;
     });
@@ -449,6 +472,9 @@ async function read_file(file) {
                 matrix = d3.tsvParseRows(content, (row) => row.map((value) => +value));
             } else {
                 reject(new Error("Unsupported file format"));
+            }
+            if (matrix.length == 113 && matrix[0].length == 113) {
+                return filter_default_mode_network(matrix);
             }
             resolve(matrix);
         };
