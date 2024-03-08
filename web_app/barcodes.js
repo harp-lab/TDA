@@ -473,9 +473,6 @@ async function read_file(file) {
             } else {
                 reject(new Error("Unsupported file format"));
             }
-            if (matrix.length == 113 && matrix[0].length == 113) {
-                return filter_default_mode_network(matrix);
-            }
             resolve(matrix);
         };
 
