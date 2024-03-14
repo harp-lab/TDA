@@ -1,6 +1,10 @@
 var bar_color = "#001E62";
 var bar_hover_color = "#D50032";
 var bar_click_color = "#FFBF3F";
+// var lh_color = "#212529";
+// var rh_color = "#0d6efd";
+var lh_color = "purple";
+var rh_color = "teal";
 
 function filter_default_mode_network(matrix) {
     // Default mode network's row and column ranges to keep
@@ -349,7 +353,42 @@ function show_fcn(matrix, max_distance, html_element_id, id_number) {
 
     let nodes = [];
     for (let i = 0; i < matrix.length; i++) {
-        nodes.push({id: i, name: i.toString()});
+        nodes.push({id: i, mode_id: i, name: i.toString()});
+    }
+
+    // If matrix has 24 nodes named them default mode network
+    if (matrix.length == 24) {
+        nodes = [];
+        var default_mode_network = [
+            [45, "17Networks_LH_DefaultA_IPL", -44, -68, 38],
+            [46, "17Networks_LH_DefaultA_PFCd", -22, 28, 46],
+            [47, "17Networks_LH_DefaultA_pCunPCC", -6, -52, 32],
+            [48, "17Networks_LH_DefaultA_PFCm", -8, 50, 4],
+            [49, "17Networks_LH_DefaultB_Temp", -58, -12, -20],
+            [50, "17Networks_LH_DefaultB_IPL", -52, -56, 28],
+            [51, "17Networks_LH_DefaultB_PFCd", -8, 50, 40],
+            [52, "17Networks_LH_DefaultB_PFCl", -40, 14, 50],
+            [53, "17Networks_LH_DefaultB_PFCv", -48, 28, -4],
+            [54, "17Networks_LH_DefaultC_IPL", -42, -78, 30],
+            [55, "17Networks_LH_DefaultC_Rsp", -12, -56, 14],
+            [56, "17Networks_LH_DefaultC_PHC", -26, -32, -18],
+            [102, "17Networks_RH_DefaultA_Temp", 62, -6, -18],
+            [103, "17Networks_RH_DefaultA_IPL", 52, -56, 28],
+            [104, "17Networks_RH_DefaultA_PFCd", 24, 36, 44],
+            [105, "17Networks_RH_DefaultA_pCunPCC", 6, -52, 30],
+            [106, "17Networks_RH_DefaultA_PFCm", 8, 50, 6],
+            [107, "17Networks_RH_DefaultB_Temp", 62, -26, -6],
+            [108, "17Networks_RH_DefaultB_AntTemp", 52, 6, -30],
+            [109, "17Networks_RH_DefaultB_PFCd", 10, 52, 40],
+            [110, "17Networks_RH_DefaultB_PFCv", 48, 28, -12],
+            [111, "17Networks_RH_DefaultC_IPL", 48, -70, 26],
+            [112, "17Networks_RH_DefaultC_Rsp", 14, -54, 14],
+            [113, "17Networks_RH_DefaultC_PHC", 26, -28, -20]
+        ];
+
+        for (var i = 0; i < default_mode_network.length; i++) {
+            nodes.push({id: i, mode_id: default_mode_network[i][0], name: default_mode_network[i][1]});
+        }
     }
 
     let links = [];
@@ -412,7 +451,7 @@ function show_fcn(matrix, max_distance, html_element_id, id_number) {
         .call(drag) // Enable drag
         .on("mouseover", function (event, d) {
             const current_element = d3.select(this);
-            const msg = `Node ${d.id}`;
+            const msg = `${d.name}`;
             $(this).tooltip({
                 title: msg,
                 placement: "top",
@@ -429,7 +468,17 @@ function show_fcn(matrix, max_distance, html_element_id, id_number) {
 
     node.append("circle")
         .attr("r", 8)
-        .attr("fill", bar_color)
+        .attr("fill", function(d) {
+            // Get the color based on the node's id
+            if (nodes.length == 24 && d.id <= 11) {
+                return lh_color;
+            } else if (nodes.length == 24 && d.id > 11) {
+                return rh_color;
+            } else {
+                // If the node id doesn't match any condition, use a default color
+                return bar_color; // You can change this to any default color you prefer
+            }
+        })
         .style("stroke-width", 1);
 
 
@@ -441,7 +490,7 @@ function show_fcn(matrix, max_distance, html_element_id, id_number) {
         .style("stroke-width", 1)
         .style("pointer-events", "none")
         .text(function (d) {
-            return d.id
+            return d.mode_id
         });
 
 
