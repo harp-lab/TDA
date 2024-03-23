@@ -9,7 +9,7 @@ Three side-by-side views displaying the persistent barcodes for the three differ
 - Application URL: [TDA webapp](https://harp-lab.github.io/TDA/)
 - Video demo: 
 
-https://raw.githubusercontent.com/harp-lab/TDA/main/screenshots/demo.mp4
+https://github.com/harp-lab/TDA/assets/5465070/11ce4a75-09e4-489a-9070-7c473c007932
 
 
 ### References
