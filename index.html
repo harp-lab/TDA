@@ -36,9 +36,15 @@
             </button>
             <a class="align-middle m-auto btn btn-outline-dark btn-sm text-decoration-none"
                href="https://github.com/harp-lab/TDA"
-               data-bs-toggle="tooltip" data-bs-placement="left"
+               data-bs-toggle="tooltip" data-bs-placement="bottom"
                title="Github Code Repository">
                 <i class="bi bi-github"></i> Code
+            </a>
+            <a class="align-middle m-auto btn btn-outline-dark btn-sm text-decoration-none"
+               href="https://github.com/harp-lab/TDA/screenshots/demo.mp4"
+               data-bs-toggle="tooltip" data-bs-placement="bottom"
+               title="Video demo">
+                <i class="bi bi-file-play"></i> Demo Video
             </a>
         </div>
         <!-- Modal -->
@@ -75,11 +81,11 @@
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-start">
                                 <div class="ms-2 me-auto">
-                                    <div class="fw-bold">Click Barcode</div>
-                                    Click a barcode on the left side view. This will visualize two networks on the right
-                                    side. The first network is constructed using the starting threshold of the bar, and
-                                    the
-                                    second one uses the ending threshold.
+                                    <div class="fw-bold">Barcodes</div>
+                                    Each set of barcodes is represented as horizontal bars. Each bar corresponds to a topological feature in your data, and its length represents the range of thresholds over which that feature persists.
+                                    To explore a specific barcode, simply click on it. This will display two network visualizations on the bottom.
+                                     The first network is constructed using the starting threshold of the selected bar, while the second network uses the ending threshold.
+                                    The purple color nodes (<span class="badge" style="background: purple">X</span>) represent brain regions from the left hemisphere, while the green color nodes (<span class="badge" style="background: green">Y</span>) represent regions from the right hemisphere. You can hover over any node to see its actual label within the brain.
                                 </div>
                             </li>
                             <li class="list-group-item d-flex justify-content-between align-items-start">
