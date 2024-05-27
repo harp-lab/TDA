@@ -1,7 +1,7 @@
 # TDA
 
 TDA and Persistent homology
-![0-dimensional barcodes](screenshots/demo_data.png)
+
 
 # Python App
 ## Features
