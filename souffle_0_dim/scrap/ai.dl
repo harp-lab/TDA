@@ -1,0 +1,53 @@
+.number_type vertex
+.decl all_nodes(n: vertex)
+.decl edge(x: vertex, y: vertex, dist: float)
+.decl threshold_edge(x: vertex, y: vertex)
+.decl reachable(x: vertex, y: vertex)
+.decl component(node: vertex, comp: vertex)
+.decl min_component(node: vertex, comp: vertex)
+//.decl wcc_g(node:vertex, comp:vertex)
+.input edge
+
+.output reachable
+.output component
+.output min_component
+//.output wcc_g
+
+// Include edges that are within the threshold distance
+threshold_edge(x, y) :- edge(x, y, dist), dist <= 6.08.
+//threshold_edge(y, x) :- edge(x, y, dist), dist <= 2.83.
+
+// Calculate reachability using transitive closure
+reachable(x, y) :- threshold_edge(x, y).
+reachable(x, y) :- reachable(x, z), threshold_edge(z, y).
+
+// All nodes of the graph
+all_nodes(node) :- edge(node, _, _).
+all_nodes(node) :- edge(_, node, _).
+
+// Assign components to nodes
+//component(x, y) :- reachable(x, y).
+//component(x, y) :- reachable(y, x), y = x.
+
+//component(x, y) :- reachable(y, x), y = x.
+//component(node, comp) :- reachable(_, node), comp = min node : reachable(node, comp).
+
+// Assign components to nodes: find the minimum node reachable from each node
+min_component(node, min_comp) :- all_nodes(node), min_comp = min c : reachable(node, c).
+
+// Assign each node to its component
+component(node, comp) :- min_component(node, comp).
+
+// To find nodes without a reachable pair (isolated components)
+component(node, node) :- all_nodes(node), !reachable(node, _), !reachable(_, node).
+
+
+/*
+// Assign components to nodes
+component(node, min_comp) :- reachable(node, min_comp).
+component(node, min_comp) :- reachable(min_comp, node), min_comp = node.
+
+
+
+wcc_g(nd2, nd) :- component(_, nd2), nd = min nd1 : component(nd1, nd2).
+*/

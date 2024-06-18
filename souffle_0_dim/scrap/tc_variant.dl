@@ -1,0 +1,23 @@
+.decl users(name: symbol, city: symbol)
+.decl friendships(user_name: symbol, friend_name: symbol)
+
+// Facts
+users("Alex", "Chicago").
+users("Bob", "Detroit").
+users("Carter", "Chicago").
+users("David", "Atlanta").
+users("Ethan", "Boston").
+
+friendships("Alex", "Bob").
+friendships("Alex", "Carter").
+friendships("Bob", "David").
+friendships("Carter", "David").
+friendships("David", "Ethan").
+
+.decl connectedToChicago(name: symbol, city: symbol)
+// Base rule
+connectedToChicago(X, Y) :- users(X, "Chicago"), users(X, Y).
+// Inductive rule
+connectedToChicago(Z, U) :- connectedToChicago(X, Y), friendships(X, Z), users(Z, U), U != "Chicago".
+.output connectedToChicago
+

@@ -1,0 +1,58 @@
+.type vertex = number
+.decl node(x: vertex)
+.decl edge(x: vertex, y: vertex, distance: float)
+.decl total_component(x: number)
+.decl unique_distance(distance: float)
+.decl distance_component(distance: float, total: number)
+
+// Input edge.facts, and output on stdout by running souffle -D- cc2.dl
+.input edge
+
+// All nodes of the graph
+node(x) :- edge(x, _, _).
+node(x) :- edge(_, x, _).
+
+// Calculate unique distances from edges
+unique_distance(distance) :- edge(_, _, distance).
+
+.comp ConnectedComponents {
+
+.decl threshold_edge(x: vertex, y: vertex)
+.decl reachable(x: vertex, y: vertex)
+.decl component(x: vertex, component_id: vertex)
+.decl min_component(x: vertex, component_id: vertex)
+.decl unique_component(component_id: vertex)
+.decl component_count(total: number)
+.decl threshold(distance: float)
+
+//threshold(2.83).
+
+// Include edges that are within the threshold distance
+threshold_edge(x, y) :- edge(x, y, distance), threshold(t), distance <= t.
+threshold_edge(y, x) :- edge(x, y, distance), threshold(t), distance <= t.
+
+// Calculate reachability using transitive closure
+reachable(x, y) :- threshold_edge(x, y).
+reachable(x, y) :- reachable(x, z), threshold_edge(z, y).
+
+// Find the minimum component for each reachable pair
+min_component(x, component_id) :- reachable(x, _), component_id = min y : reachable(x, y).
+
+// Assign each node to its component for each reachable pair
+component(x, component_id) :- min_component(x, component_id).
+
+// Handle isolated nodes (nodes without any reachable pairs)
+component(x, x) :- node(x), !reachable(x, _), !reachable(_, x).
+
+// Count number of components
+unique_component(component_id) :- component(_, component_id).
+component_count(total) :- total = count : unique_component(_).
+
+}
+
+
+.init ccInstance =  ConnectedComponents
+ccInstance.threshold(3.6).
+total_component(x) :- ccInstance.component_count(x).
+.output total_component
+

@@ -1,0 +1,26 @@
+// Types created by the user
+.number_type nodes
+// Declared Facts
+.decl node(n:nodes)
+.decl num_nodes(n:nodes)
+.decl edge(n:nodes, m:nodes, dist:float)
+.decl path(n:nodes, m:nodes)
+.decl wcc(n:nodes, m:nodes)
+.decl wcc_g(n:nodes, m:nodes)
+.input edge
+.output wcc_g
+// create all the nodes
+node(X) :- edge(X, _, _).
+node(X) :- edge(_, X, _).
+
+// create all of the paths
+path(X, Z) :- edge(X, Z, dist), node(X), node(Z), dist <= 2.83.
+path(X, Z) :- path(X, Y), edge(Y, Z, _), node(X), node(Y), node(Z).
+// find all weakly connected components
+wcc(nd, nd) :- node(nd).
+wcc(nd1, nd2) :- path(nd1, nd2), nd1 < nd2.
+wcc(nd1, nd2) :- path(nd2, nd1), nd1 < nd2.
+wcc(nd1, nd3) :- wcc(nd1, nd2), wcc(nd2, nd3).
+wcc(nd1, nd3) :- wcc(nd1, nd2), wcc(nd3, nd2).
+// using the weakly connected components find the subgraphs
+wcc_g(nd2, nd) :- wcc(_, nd2), nd = min nd1 : wcc(nd1, nd2).

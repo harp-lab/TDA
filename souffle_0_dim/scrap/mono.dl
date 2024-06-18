@@ -1,0 +1,12 @@
+.decl parent(n: symbol, m: symbol)
+.decl ancestor(n: symbol, m: symbol)
+.output ancestor
+// Facts of parent: Extensional database
+parent("john", "bob").
+parent("bob", "alice").
+parent("alice", "charlie").
+// Base rule
+ancestor(X, Y) :- parent(X, Y).
+// Inductive rule
+ancestor(X, Z) :- parent(X, Y), ancestor(Y, Z).
+

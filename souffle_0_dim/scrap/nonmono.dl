@@ -1,0 +1,11 @@
+.decl person(n: symbol)
+.decl adult(n: symbol)
+.decl child(n: symbol)
+
+
+person("john").
+person("alice").
+child("alice").
+adult(X) :- person(X), !child(X).
+
+.output adult, child

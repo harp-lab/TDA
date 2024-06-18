@@ -1,0 +1,8 @@
+.decl A(n: number)
+A(1).
+A(123).
+A(10).
+
+.decl TotalA(n: number)
+TotalA(y) :- y = sum x:{A(x)}.
+.output TotalA

@@ -1,0 +1,44 @@
+// Graph 
+// n 4, e 10
+// a b 2.83
+// a c 6.08
+// a d 6.08
+// a e 3.60
+// b c 4.12
+// b d 5.00
+// b e 3.60
+// c d 2.00
+// c e 4.24
+// d e 3.16
+
+// Input relations
+.decl edge(node1:number, node2:number, distance:float)
+.input edge
+
+// Relation to store connected nodes within the given distance
+.decl connected(node1:number, node2:number)
+// Base case: directly connected nodes within the distance threshold
+connected(node1, node2) :- edge(node1, node2, distance), distance <= 2.83.
+connected(node2, node1) :- edge(node1, node2, distance), distance <= 2.83.
+
+// Recursive case: transitive closure
+connected(node1, node2) :- connected(node1, node3), connected(node3, node2), node1!=node2.
+
+.decl component(node:number, componentId:number)
+// Assign a component ID to each node
+
+component(node, node) :- connected(node, _).
+component(node, minId) :- connected(node, other), component(other, minId), minId = min(minId, node).
+
+//component(node, min(node)) :- connected(node, node).
+//component(node1, min(node2)) :- connected(node1, node2), component(node2, componentId).
+
+// Ensure component IDs are consistent
+component(node, componentId) :- component(node, tempId), component(tempId, componentId).
+
+// Count the number of unique components
+//.decl componentCount(n:number)
+//componentCount(n) :- n = count:countDistinct(componentId) : component(_, componentId).
+
+// Output the number of connected components
+.output component

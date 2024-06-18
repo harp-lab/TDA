@@ -1,0 +1,93 @@
+.type vertex = number
+.decl node(x: vertex)
+.decl edge(x: vertex, y: vertex, distance: float)
+.decl total_component(x: number, threshold: float)
+.decl unique_distance(distance: float)
+.decl max_distance(distance: float)
+.decl total_component_smallest_threshold(x: number, threshold: float)
+.input edge
+// All nodes of the graph
+node(x) :- edge(x, _, _).
+node(x) :- edge(_, x, _).
+// Calculate unique distances from edges
+unique_distance(distance) :- edge(_, _, distance).
+.comp ConnectedComponents {
+    // there exists an edge `x` `y` after filtering by threshold `t`
+    .decl threshold_edge(x: vertex, y: vertex, t: float)
+    // a node `x` is reachable from node `y` within subgraph created under threshold `t`
+    .decl reachable(x: vertex, y: vertex, t: float)
+    // `component_id` is a connected componnent contains node `x` on subgraph ..... `t`
+    .decl component(x: vertex, component_id: vertex, t: float)
+    // `min_component` is the minimum component id for node `x` on subgraph created under threshold `t`
+    .decl min_component(x: vertex, component_id: vertex, t: float)
+    // `unique_component` is the component id  on subgraph created under threshold `t`
+    .decl unique_component(component_id: vertex, t: float)
+    // `component_count` is the number of connected components on subgraph created under threshold `t`
+    .decl component_count(total: number, t: float)
+    .decl threshold(distance: float)
+    // Include edges that are within the threshold distance
+    threshold_edge(x, y, t) :- edge(x, y, distance), threshold(t), distance <= t.
+    threshold_edge(y, x, t) :- edge(x, y, distance), threshold(t), distance <= t.
+    // Calculate reachability using transitive closure
+    reachable(x, y, t) :- threshold_edge(x, y, t).
+    reachable(x, y, t) :- reachable(x, z, t), threshold_edge(z, y, t).
+    // Find the minimum component for each reachable pair
+    min_component(x, component_id, t) :- reachable(x, _, t), component_id = min y : reachable(x, y, t).
+    // Assign each node to its component for each reachable pair
+    component(x, component_id, t) :- min_component(x, component_id, t).
+    // Handle isolated nodes (nodes without any reachable pairs)
+    component(x, x, t) :-  threshold(t), node(x), !reachable(x, _, t), !reachable(_, x, t).
+    // Count number of components
+    unique_component(component_id, t) :- component(_, component_id, t).
+    component_count(total, t) :- threshold(t) , total = count : unique_component(_, t).
+}
+// edge(x, y, d) :- edge(y, x, d).
+
+
+max_distance(distance) :- distance = max x: {unique_distance(x)}.
+
+.init ccInstance = ConnectedComponents
+ccInstance.threshold(t) :- unique_distance(t).
+total_component(x, t) :- ccInstance.component_count(x, t).
+total_component_smallest_threshold(x, threshold) :-
+    node(x), threshold = min t : total_component(x, t).
+
+.decl sorted_thresholds(x: number, threshold: float)
+sorted_thresholds(x, threshold) :-
+    total_component_smallest_threshold(_, threshold),
+    x = count : {
+        total_component_smallest_threshold(_, t),
+        t > threshold
+    } + 1.
+
+.decl bar(id: number, dist: float, total: number)
+bar(id1, t1, x2 - x1) :-
+    sorted_thresholds(id1, t1),
+    sorted_thresholds(id2, t2),
+    total_component_smallest_threshold(x1, t1),
+    total_component_smallest_threshold(x2, t2),
+    id2 = id1 + 1,
+    t2 < t1.
+.decl barcodes(start_value: float, end_value: float, total: number)
+barcodes(0.0, dist, total) :- bar(_, dist, total).
+
+.decl total_bars(total: number)
+total_bars(total) :- total = sum x:{bar(_, _, x)}.
+
+// Compute the total number of nodes
+.decl total_nodes(total: number)
+total_nodes(total) :- total = count : node(_).
+
+// Compute the value of node - total_bars
+.decl node_minus_total_bars(value: number)
+node_minus_total_bars(value) :- 
+    total_nodes(node_count), 
+    total_bars(bar_count), 
+    value = node_count - bar_count.
+
+barcodes(0, max_dist, node_minus_bars) :-
+    max_distance(max_dist),
+    node_minus_total_bars(node_minus_bars).
+
+.output barcodes(IO=stdout)
+

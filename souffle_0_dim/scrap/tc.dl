@@ -1,0 +1,23 @@
+.decl users(n: symbol, m: symbol)
+.decl friendships(n: symbol, m: symbol)
+.decl tc(n: symbol, m: symbol)
+
+// Facts
+users("Alex", "Chicago").
+users("Bob", "Detroit").
+users("Carter", "Chicago").
+users("David", "Atlanta").
+users("Ethan", "Boston").
+
+friendships("Alex", "Bob").
+friendships("Alex", "Carter").
+friendships("Bob", "David").
+friendships("Carter", "David").
+friendships("David", "Ethan").
+
+// Base rule
+tc(X, Y) :- friendships(X, Y).
+// Inductive rule
+tc(X, Z) :- friendships(X, Y), tc(Y, Z).
+.output tc
+
