@@ -6,11 +6,7 @@
 .decl max_distance(distance: float)
 .decl total_component_smallest_threshold(x: number, threshold: float)
 .input edge
-// All nodes of the graph
-node(x) :- edge(x, _, _).
-node(x) :- edge(_, x, _).
-// Calculate unique distances from edges
-unique_distance(distance) :- edge(_, _, distance).
+
 .comp ConnectedComponents {
     // there exists an edge `x` `y` after filtering by threshold `t`
     .decl threshold_edge(x: vertex, y: vertex, t: float)
@@ -43,15 +39,28 @@ unique_distance(distance) :- edge(_, _, distance).
 }
 // edge(x, y, d) :- edge(y, x, d).
 
-
+// All nodes of the graph
+node(x) :- edge(x, _, _).
+node(x) :- edge(_, x, _).
+// Calculate unique distances from edges
+unique_distance(distance) :- edge(_, _, distance).
+// Calculate maximum distance from unique distances
 max_distance(distance) :- distance = max x: {unique_distance(x)}.
+// Calculate the total number of nodes
+.decl total_nodes(total: number)
+total_nodes(total) :- total = count : node(_).
 
 .init ccInstance = ConnectedComponents
 ccInstance.threshold(t) :- unique_distance(t).
+
+// Calculate total number of components for each unique distance
 total_component(x, t) :- ccInstance.component_count(x, t).
+
+// Calculate the smallest threshold for each unique component count
 total_component_smallest_threshold(x, threshold) :-
     node(x), threshold = min t : total_component(x, t).
 
+// Assign an index to each threshold based on the number of thresholds greater than it and reverse sort
 .decl sorted_thresholds(x: number, threshold: float)
 sorted_thresholds(x, threshold) :-
     total_component_smallest_threshold(_, threshold),
@@ -60,6 +69,7 @@ sorted_thresholds(x, threshold) :-
         t > threshold
     } + 1.
 
+// Calculate the difference in component counts between consecutive sorted thresholds
 .decl bar(id: number, dist: float, total: number)
 bar(id1, t1, x2 - x1) :-
     sorted_thresholds(id1, t1),
@@ -68,17 +78,16 @@ bar(id1, t1, x2 - x1) :-
     total_component_smallest_threshold(x2, t2),
     id2 = id1 + 1,
     t2 < t1.
+
+// Store the barcodes with start - end range and number of bars with that range    
 .decl barcodes(start_value: float, end_value: float, total: number)
 barcodes(0.0, dist, total) :- bar(_, dist, total).
 
+// Calculate the total number of bars
 .decl total_bars(total: number)
 total_bars(total) :- total = sum x:{bar(_, _, x)}.
 
-// Compute the total number of nodes
-.decl total_nodes(total: number)
-total_nodes(total) :- total = count : node(_).
-
-// Compute the value of node - total_bars
+// Calculate the value of inifity bars (max distance as infinity)
 .decl node_minus_total_bars(value: number)
 node_minus_total_bars(value) :- 
     total_nodes(node_count), 
@@ -90,4 +99,3 @@ barcodes(0, max_dist, node_minus_bars) :-
     node_minus_total_bars(node_minus_bars).
 
 .output barcodes(IO=stdout)
-
