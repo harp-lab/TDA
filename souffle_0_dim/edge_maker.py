@@ -13,13 +13,26 @@ def parse_command_line_args():
     args = parser.parse_args()
     return args.dir, args.matrix, args.output
 
+def get_delimiter(filepath):
+    with open(filepath, 'r') as file:
+        first_line = file.readline()
+        if ',' in first_line:
+            return ','
+        elif '\t' in first_line:
+            return '\t'
+        else:
+            raise ValueError("Could not detect delimiter")
+
+
 def read_csv(filepath):
     data = []
+    delimiter = get_delimiter(filepath)
     with open(filepath) as file:
-        csv_file = csv.reader(file)
+        csv_file = csv.reader(file, delimiter=delimiter)
         for row in csv_file:
             row = list(map(float, row))
             data.append(row)
+
     return data
 
 def write_csv(filepath, data):
