@@ -1,67 +1,57 @@
 .type vertex = number
-.decl node(x: vertex)
 .decl edge(x: vertex, y: vertex, distance: float)
-.decl total_component(x: number, threshold: float)
-.decl unique_distance(distance: float)
-.decl max_distance(distance: float)
-.decl total_component_smallest_threshold(x: number, threshold: float)
 .input edge
 
-.comp ConnectedComponents {
-    // there exists an edge `x` `y` after filtering by threshold `t`
-    .decl threshold_edge(x: vertex, y: vertex, t: float)
-    // a node `x` is reachable from node `y` within subgraph created under threshold `t`
-    .decl reachable(x: vertex, y: vertex, t: float)
-    // `component_id` is a connected componnent contains node `x` on subgraph ..... `t`
-    .decl component(x: vertex, component_id: vertex, t: float)
-    // `min_component` is the minimum component id for node `x` on subgraph created under threshold `t`
-    .decl min_component(x: vertex, component_id: vertex, t: float)
-    // `unique_component` is the component id  on subgraph created under threshold `t`
-    .decl unique_component(component_id: vertex, t: float)
-    // `component_count` is the number of connected components on subgraph created under threshold `t`
-    .decl component_count(total: number, t: float)
-    .decl threshold(distance: float)
-    // Include edges that are within the threshold distance
-    threshold_edge(x, y, t) :- edge(x, y, distance), threshold(t), distance <= t.
-    threshold_edge(y, x, t) :- edge(x, y, distance), threshold(t), distance <= t.
-    // Calculate reachability using transitive closure
-    reachable(x, y, t) :- threshold_edge(x, y, t).
-    reachable(x, y, t) :- reachable(x, z, t), threshold_edge(z, y, t).
-    // Find the minimum component for each reachable pair
-    min_component(x, component_id, t) :- reachable(x, _, t), component_id = min y : reachable(x, y, t).
-    // Assign each node to its component for each reachable pair
-    component(x, component_id, t) :- min_component(x, component_id, t).
-    // Handle isolated nodes (nodes without any reachable pairs)
-    component(x, x, t) :-  threshold(t), node(x), !reachable(x, _, t), !reachable(_, x, t).
-    // Count number of components
-    unique_component(component_id, t) :- component(_, component_id, t).
-    component_count(total, t) :- threshold(t) , total = count : unique_component(_, t).
-}
-// edge(x, y, d) :- edge(y, x, d).
+.decl unique_distance(distance: float)
+.decl max_distance(distance: float)
+// there exists an edge `x` `y` after filtering by threshold `t`
+.decl threshold_edge(x: vertex, y: vertex, t: float)
+// Assign an index to each threshold based on the number of thresholds greater than it and reverse sort
+.decl sorted_thresholds(x: number, threshold: float)
+.decl node(x: vertex)
+.decl total_nodes(total: number)
+// `total_component` is the number of connected components on subgraph created under threshold `t`
+.decl total_component(x: number, threshold: float)
+.decl total_component_smallest_threshold(x: number, threshold: float)
+// a node `x` is reachable from node `y` within subgraph created under threshold `t`
+.decl reachable(x: vertex, y: vertex, t: float)
+// `component_id` is a connected component contains node `x` on subgraph ..... `t`
+// `min_component` is the minimum component id for node `x` on subgraph created under threshold `t`
+.decl component(x: vertex, component_id: vertex, t: float)
+// `unique_component` is the component id  on subgraph created under threshold `t`
+.decl unique_component(component_id: vertex, t: float)
+.decl bar(id: number, dist: float, total: number)
+.decl node_minus_total_bars(value: number)
+.decl barcodes(start_value: float, end_value: float, total: number)
 
 // All nodes of the graph
 node(x) :- edge(x, _, _).
 node(x) :- edge(_, x, _).
+// Calculate the total number of nodes
+total_nodes(total) :- total = count : node(_).
 // Calculate unique distances from edges
 unique_distance(distance) :- edge(_, _, distance).
 // Calculate maximum distance from unique distances
 max_distance(distance) :- distance = max x: {unique_distance(x)}.
-// Calculate the total number of nodes
-.decl total_nodes(total: number)
-total_nodes(total) :- total = count : node(_).
-
-.init ccInstance = ConnectedComponents
-ccInstance.threshold(t) :- unique_distance(t).
-
+// Include edges that are within the threshold distance
+threshold_edge(x, y, t) :- edge(x, y, distance), unique_distance(t), distance <= t.
+threshold_edge(y, x, t) :- edge(x, y, distance), unique_distance(t), distance <= t.
+// Calculate reachability using transitive closure
+reachable(x, y, t) :- threshold_edge(x, y, t).
+reachable(x, y, t) :- reachable(x, z, t), threshold_edge(z, y, t).
+// Find the minimum component for each reachable pair
+component(x, component_id, t) :- reachable(x, _, t), component_id = min y : reachable(x, y, t).
+// Handle isolated nodes (nodes without any reachable pairs)
+component(x, x, t) :-  unique_distance(t), node(x), !reachable(x, _, t), !reachable(_, x, t).
+// Count number of components
+unique_component(component_id, t) :- component(_, component_id, t).
 // Calculate total number of components for each unique distance
-total_component(x, t) :- ccInstance.component_count(x, t).
+total_component(total, t) :- unique_distance(t) , total = count : unique_component(_, t).
 
 // Calculate the smallest threshold for each unique component count
 total_component_smallest_threshold(x, threshold) :-
     node(x), threshold = min t : total_component(x, t).
 
-// Assign an index to each threshold based on the number of thresholds greater than it and reverse sort
-.decl sorted_thresholds(x: number, threshold: float)
 sorted_thresholds(x, threshold) :-
     total_component_smallest_threshold(_, threshold),
     x = count : {
@@ -70,7 +60,6 @@ sorted_thresholds(x, threshold) :-
     } + 1.
 
 // Calculate the difference in component counts between consecutive sorted thresholds
-.decl bar(id: number, dist: float, total: number)
 bar(id1, t1, x2 - x1) :-
     sorted_thresholds(id1, t1),
     sorted_thresholds(id2, t2),
@@ -80,16 +69,14 @@ bar(id1, t1, x2 - x1) :-
     t2 < t1.
 
 // Store the barcodes with start - end range and number of bars with that range    
-.decl barcodes(start_value: float, end_value: float, total: number)
 barcodes(0.0, dist, total) :- bar(_, dist, total).
 
 // Calculate the total number of bars
 .decl total_bars(total: number)
 total_bars(total) :- total = sum x:{bar(_, _, x)}.
 
-// Calculate the value of inifity bars (max distance as infinity)
-.decl node_minus_total_bars(value: number)
-node_minus_total_bars(value) :- 
+// Calculate the value of infinity bars (max distance as infinity)
+node_minus_total_bars(value) :-
     total_nodes(node_count), 
     total_bars(bar_count), 
     value = node_count - bar_count.
