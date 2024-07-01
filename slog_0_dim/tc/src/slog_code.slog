@@ -1,0 +1,9 @@
+[(path x y) <-- (edge x y distance)]
+[(filtered h (edge x y distance)) <--
+    (edge x y distance)
+    (threshold h)
+    (<= distance distance)]
+
+[(filtered h (path y z)) <--
+    (filtered h (edge x y distance))
+    (filtered h (path y z))]
